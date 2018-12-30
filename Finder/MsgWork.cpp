@@ -37,12 +37,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (LOWORD(wParam))
 		{
 		case ID_COPY_ITEM:
+			main->file_manip(false);
 			break;
 
 		case ID_CUT_ITEM:
+			main->file_manip(true);
 			break;
 
-		case ID_MENU_OPEN:
+		case ID_OPEN_ITEM:
 			main->open();
 			break;
 
@@ -52,10 +54,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case ID_PASTE_ITEM:
 			main->paste();
 			break;
+
+		case ID_RENAME_ITEM:
+			main->rename();
+			break;
+
 		case ID_CREATE_FOLDER:
+			main->create_folder();
 			break;
 
 		case ID_CREATE_TEXT_ITEM:
+			main->create_txt();
 			break;
 
 		case ID_INFO_ITEM:
@@ -123,10 +132,11 @@ BOOL CALLBACK DlgInfo(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 		return TRUE;
 
 	case WM_COMMAND:
-		if (LOWORD(wParam) == ID_BUTTON_DLG) {
+		if (LOWORD(wParam) == ID_BUTTON_DLG || LOWORD(wParam) == IDCANCEL) {
 			EndDialog(hDlg, LOWORD(wParam));
 			return TRUE;
 		}
+			
 		break;
 	}
 	return FALSE;

@@ -1,5 +1,4 @@
 #pragma once
-#define _WIN32_IE 0x301
 #include <Windows.h>
 #include <string>
 

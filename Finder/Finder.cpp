@@ -10,10 +10,40 @@ Functional::Path Finder::_get_path() const
 	return path;
 }
 
-bool Finder::create_txt()
+void Finder::create_txt()
 {
+	int i = 2;
+	std::string name = local_ru::DefaultTextFile;
+	std::string additional = ".txt";
 
-	return false;
+	while (!find_same(path.main_path + name + additional))
+		additional = " (" + std::to_string(i++) + ").txt";
+	additional = path.main_path + name + additional;
+
+	if (CreateFile(additional.c_str(), NULL, NULL, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL))
+		update_listview();
+}
+
+void Finder::create_folder()
+{
+	int i = 2;
+	std::string name = local_ru::DefaultFolder;
+	std::string additional;
+
+	while (!find_same(path.main_path + name + additional))
+		additional = " (" + std::to_string(i++) + ")";
+	additional = path.main_path + name + additional;
+
+	if(CreateDirectory(additional.c_str(),NULL))
+		update_listview();
+}
+
+void Finder::rename()
+{
+	char *temp = new char[200];
+	HWND edit = ListView_GetEditControl(ListView);
+	SendMessage(edit, EM_GETLINE, NULL, (LPARAM)temp);
+
 }
 
 void Finder::open()
@@ -53,10 +83,16 @@ void Finder::next_button()
 void Finder::select_item()
 {
 	char *temp = new char[200];
+	temp[0] = 0;
 	int index = ListView_GetNextItem(ListView,
 		-1, LVNI_ALL | LVNI_SELECTED);
 	ListView_GetItemText(ListView, index, 0, temp, 200);
+
+	if (!temp) 
+		goto end;
+
 	path.selected_file = path.main_path + temp;
+	end:
 	delete[] temp;
 }
 
@@ -142,7 +178,7 @@ void Finder::resize_objects()
 
 std::string * Finder::_get_file_info(const WIN32_FIND_DATA &_file) const
 {
-	return get_file_info(_file);
+	return make_file_info(_file);
 }
 
 void Finder::show_info()

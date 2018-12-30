@@ -27,7 +27,7 @@ void Functional::_init_menu()
 	Menu = CreatePopupMenu();
 	HMENU AdditionalMenu = CreatePopupMenu();
 
-	AppendMenu(Menu, MFT_STRING, ID_MENU_OPEN, local_ru::MenuOpen);
+	AppendMenu(Menu, MFT_STRING, ID_OPEN_ITEM, local_ru::MenuOpen);
 	AppendMenu(Menu, MFT_SEPARATOR, 0, NULL);
 	AppendMenu(Menu, MFT_STRING | MF_POPUP, (UINT)AdditionalMenu, local_ru::MenuCreate);
 	{
@@ -178,7 +178,7 @@ bool Functional::open_proc()
 	return false;
 }
 
-std::string * Functional::get_file_info(const WIN32_FIND_DATA &file) const
+std::string * Functional::make_file_info(const WIN32_FIND_DATA &file) const
 {
 	SYSTEMTIME sys_time;
 	char *buffer;
@@ -312,7 +312,7 @@ void Functional::update_listview()
 			if (!(file._get().dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) &&
 				!(file._get().dwFileAttributes &  FILE_ATTRIBUTE_REPARSE_POINT) &&
 				lstrcmp(file._get().cFileName, "..") && lstrcmp(file._get().cFileName, ".")) {
-				_add_lw_item(get_file_info(file._get()));
+				_add_lw_item(make_file_info(file._get()));
 			}
 		} while (file.next());
 	}

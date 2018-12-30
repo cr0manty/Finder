@@ -27,5 +27,7 @@ namespace local_ru
 	const char * const MenuCreateTxt		= "Текстовый документ";
 	const char * const MenuInfo				= "Свойства";
 	const char * const MenuLink				= "Создать ярлык";
-	const char * const DefaultTextFile		= "Новый текстовый файл";
+	const char * const DefaultTextFile		= "Новый текстовый документ";
+	const char * const DefaultFolder		= "Новая папка";
+
 }

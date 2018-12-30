@@ -7,7 +7,10 @@ public:
 	Finder(HWND);
 	Functional::Path _get_path() const;
 
-	bool create_txt();
+	void create_txt();
+	void create_folder();
+	void rename();
+
 	void open();
 	void back_button();
 	void next_button();

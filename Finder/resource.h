@@ -1,10 +1,8 @@
 //{{NO_DEPENDENCIES}}
 // Включаемый файл, созданный в Microsoft Visual C++.
-// Используется Kyrsach_cpro.rc
+// Используется Finder.rc
 //
-#define ID_CREATE                       103
 #define IDC_EDIT1                       1006
-#define ID_DIALOGBOX_EDIT1              1006
 #define IDC_EDIT2                       1006
 #define ID_DLG_INFO                     1007
 #define ID_BUTTON_DLG                   1007

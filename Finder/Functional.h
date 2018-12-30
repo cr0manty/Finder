@@ -7,7 +7,6 @@
 
 #pragma comment(lib, "ComCtl32.Lib")
 
-#define ID_CREATE_FOLDER 0x00001
 #define ID_CREATE_TEXT_ITEM 0x00002
 #define ID_BACK_BUTTON 0x00003
 #define ID_NEXT_BUTTON 0x00004
@@ -19,10 +18,11 @@
 #define ID_PASTE_ITEM 0x00010
 #define ID_LISTVIEW 0x00011
 #define ID_TREEVIEW 0x00012
-#define ID_MENU_OPEN 0x00013
+#define ID_OPEN_ITEM 0x00013
 #define ID_RENAME_ITEM 0x00014
 #define ID_INFO_ITEM 0x00015
 #define ID_LINK_ITEM 0x00016
+#define ID_CREATE_FOLDER 0x00017
 
 static HINSTANCE hInst;
 static LPCTSTR wnd_class = "Finder";
@@ -81,7 +81,7 @@ public:
 	bool make_paste();
 	void update_listview();
 
-	std::string* get_file_info(const WIN32_FIND_DATA &) const;
+	std::string* make_file_info(const WIN32_FIND_DATA &) const;
 	~Functional();
 };
 
