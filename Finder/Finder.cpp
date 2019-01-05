@@ -16,7 +16,7 @@ void Finder::create_txt()
 	std::string name = local_ru::DefaultTextFile;
 	std::string additional = ".txt";
 
-	while (!find_same(path.main_path + name + additional))
+	while (find_same(path.main_path + name + additional))
 		additional = " (" + std::to_string(i++) + ").txt";
 	additional = path.main_path + name + additional;
 
@@ -30,7 +30,7 @@ void Finder::create_folder()
 	std::string name = local_ru::DefaultFolder;
 	std::string additional;
 
-	while (!find_same(path.main_path + name + additional))
+	while (find_same(path.main_path + name + additional))
 		additional = " (" + std::to_string(i++) + ")";
 	additional = path.main_path + name + additional;
 
@@ -120,7 +120,7 @@ void Finder::context_menu(LPARAM lParam)
 void Finder::file_manip(bool _cut)
 {
 	if (path) {
-		manip = File_Manip(path.selected_file, _cut);
+		manip = Manip(path.selected_file, path.main_path, _cut);
 	}
 }
 
@@ -184,5 +184,4 @@ std::string * Finder::_get_file_info(const WIN32_FIND_DATA &_file) const
 void Finder::show_info()
 {
 	DialogBoxParam(hInst, MAKEINTRESOURCE(ID_DLG_INFO), hWnd, (DLGPROC)DlgInfo, (LPARAM)this);
-
 }

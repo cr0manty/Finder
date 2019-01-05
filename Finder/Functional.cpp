@@ -119,7 +119,7 @@ bool Functional::delete_file(const std::string &_delete)
 {
 	SmartFinder file;
 
-	if (file.find(_delete.c_str())) {
+	if (file.find(_delete)) {
 		if (!(file._get().dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE))
 			RemoveDirectory(_delete.c_str());
 		else if (file._get().dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE)
@@ -155,7 +155,7 @@ bool Functional::is_file(const std::string &_file)
 {
 	SmartFinder file;
 
-	if (file.find(_file.c_str())) {
+	if (file.find(_file)) {
 		if (!(file._get().dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE))
 			return true;
 	}
@@ -244,9 +244,9 @@ Functional::Functional(HWND _hWnd) :
 std::string Functional::file_name() const
 {
 	std::string temp;
-	int i = manip.buffer_file.rfind('\\');
-	while (i++ < manip.buffer_file.size())
-		temp += manip.buffer_file[i];
+	int i = manip.file.rfind('\\');
+	while (i++ < manip.file.size())
+		temp += manip.file[i];
 
 	return temp;
 }
@@ -255,14 +255,14 @@ bool Functional::find_same(const std::string &_name)
 {
 	SmartFinder file;
 
-	if (file.find(_name.c_str())) {
+	if (file.find(_name)) {
 		do {
 			if (_name == std::string(path.main_path + file._get().cFileName)) {
-				return false;
+				return true;
 			}
 		} while (file.next());
 	}
-	return true;
+	return false;
 }
 
 bool Functional::make_paste()
@@ -272,10 +272,22 @@ bool Functional::make_paste()
 
 	std::string temp = path.main_path + file_name();
 
-	if (find_same(temp)) {
-		if (CopyFile(manip.buffer_file.c_str(), temp.c_str(), TRUE)) {
-			if (manip.delete_after_paste) {
-				if (!delete_file(manip.buffer_file))
+	if (!find_same(temp)) {
+		if (path.main_path == manip.path) {
+			int index = temp.rfind('.'), i = 1;
+			bool file = is_file(temp);
+
+			do {
+				if (file)
+					temp.insert(index, " (" + std::to_string(i++) + ")");
+				else
+					temp = temp + " (" + std::to_string(i++) + ")";
+			}
+			while (find_same(temp));
+		}
+		if (CopyFile(manip.file.c_str(), temp.c_str(), TRUE)) {
+			if (manip.aDelete) {
+				if (!delete_file(manip.file))
 					return false;
 			}
 		}
@@ -307,7 +319,7 @@ void Functional::update_listview()
 	ListView_DeleteAllItems(ListView);
 	buffer = path.main_path + "*.*";
 
-	if (file.find(buffer.c_str())) {
+	if (file.find(buffer)) {
 		do {
 			if (!(file._get().dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) &&
 				!(file._get().dwFileAttributes &  FILE_ATTRIBUTE_REPARSE_POINT) &&
@@ -332,24 +344,24 @@ Functional::~Functional()
 	delete[] Button;
 }
 
-Functional::File_Manip::File_Manip()
+Functional::Manip::Manip()
 {
 }
 
-Functional::File_Manip::File_Manip(const std::string &_buffer, bool _cut) :
-	buffer_file(_buffer), delete_after_paste(_cut)
+Functional::Manip::Manip(const std::string &_buffer, const std::string &_path, bool _cut) :
+	file(_buffer), aDelete(_cut), path(_path)
 {
 }
 
-Functional::File_Manip::operator bool()
+Functional::Manip::operator bool()
 {
-	return buffer_file.size();
+	return file.size();
 }
 
-void Functional::File_Manip::clear()
+void Functional::Manip::clear()
 {
-	buffer_file.clear();
-	delete_after_paste = false;
+	file.clear();
+	aDelete = false;
 }
 
 ATOM MyRegisterClass(HINSTANCE hInstance)
@@ -388,9 +400,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		NULL);
 
 	if (!hWnd)
-	{
 		return FALSE;
-	}
+
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
 	return TRUE;
