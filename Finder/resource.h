@@ -18,6 +18,8 @@
 #define ID_INFO_ITEM                    0x00015
 #define ID_LINK_ITEM                    0x00016
 #define ID_CREATE_FOLDER                0x00017
+#define ID_REFRESH_BTN                  0x00018
+#define IDB_BITMAP1                     108
 #define IDC_EDIT1                       1006
 #define IDC_EDIT2                       1006
 #define ID_DLG_INFO                     1007
@@ -32,7 +34,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        108
+#define _APS_NEXT_RESOURCE_VALUE        110
 #define _APS_NEXT_COMMAND_VALUE         40004
 #define _APS_NEXT_CONTROL_VALUE         1013
 #define _APS_NEXT_SYMED_VALUE           101

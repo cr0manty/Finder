@@ -4,6 +4,7 @@
 #include "Local.h"
 #include "resource.h"
 #include <commctrl.h>
+#include <boost/filesystem.hpp>
 
 #pragma comment(lib, "ComCtl32.Lib")
 
@@ -47,26 +48,21 @@ protected:
 	} manip;
 
 
-public:
 	Functional(HWND);
 
-	std::string file_name() const;
-	bool find_same(const std::string &);
 	int set_listviw_colum();
 	void _init_menu();
 	void _create_listview();
 	void _create_tree();
 	void _crete_objects();
 	void disk_list();
-	bool delete_file(const std::string &);
+	bool _delete(const std::string &);
 	bool _add_lw_item(const std::string *);
-	bool is_file(const std::string &);
 	bool open_proc();
 	bool make_paste();
 	void update_listview();
 
+public:
 	std::string* make_file_info(const WIN32_FIND_DATA &) const;
 	~Functional();
 };
-
-

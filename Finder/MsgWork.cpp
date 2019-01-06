@@ -51,6 +51,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case ID_LINK_ITEM:
 			break;
 
+		case ID_REFRESH_BTN:
+			main->refresh();
+			break;
+
 		case ID_PASTE_ITEM:
 			main->paste();
 			break;
@@ -115,8 +119,8 @@ BOOL CALLBACK DlgInfo(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_INITDIALOG:
 		main = (Finder*)lParam;
 		if (hFind = FindFirstFile(main->_get_path().selected_file.c_str(), &file))
-			temp = main->_get_file_info(file);
-		else return TRUE;
+			temp = main->make_file_info(file);
+		else return FALSE;
 
 		Object[0] = GetDlgItem(hDlg, IDC_STATIC1);
 		Object[2] = GetDlgItem(hDlg, IDC_STATIC2);

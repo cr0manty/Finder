@@ -1,7 +1,7 @@
 #pragma once
 #include "Functional.h"
 
-class Finder : private Functional
+class Finder : public Functional
 {
 public:
 	Finder(HWND);
@@ -22,6 +22,6 @@ public:
 	void delete_item();
 	void paste();
 	void resize_objects();
-	std::string* _get_file_info(const WIN32_FIND_DATA &) const;
 	void show_info();
+	void refresh();
 };

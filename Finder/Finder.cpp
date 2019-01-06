@@ -13,12 +13,13 @@ Functional::Path Finder::_get_path() const
 void Finder::create_txt()
 {
 	int i = 2;
-	std::string name = local_ru::DefaultTextFile;
 	std::string additional = ".txt";
-
-	while (find_same(path.main_path + name + additional))
-		additional = " (" + std::to_string(i++) + ").txt";
-	additional = path.main_path + name + additional;
+	SmartFinder file;
+	if (file.find(path.main_path + local_ru::DefaultTextFile + additional))
+		do {
+			additional = " (" + std::to_string(i++) + ").txt";
+		} while (file.next());
+	additional = path.main_path + local_ru::DefaultTextFile + additional;
 
 	if (CreateFile(additional.c_str(), NULL, NULL, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL))
 		update_listview();
@@ -27,12 +28,14 @@ void Finder::create_txt()
 void Finder::create_folder()
 {
 	int i = 2;
-	std::string name = local_ru::DefaultFolder;
 	std::string additional;
+	SmartFinder file;
 
-	while (find_same(path.main_path + name + additional))
-		additional = " (" + std::to_string(i++) + ")";
-	additional = path.main_path + name + additional;
+	if (file.find(path.main_path + local_ru::DefaultFolder + additional))
+		do {
+			additional = " (" + std::to_string(i++) + ")";
+		} while (file.next());
+	additional = path.main_path + local_ru::DefaultFolder + additional;
 
 	if(CreateDirectory(additional.c_str(),NULL))
 		update_listview();
@@ -43,20 +46,22 @@ void Finder::rename()
 	char *temp = new char[200];
 	HWND edit = ListView_GetEditControl(ListView);
 	SendMessage(edit, EM_GETLINE, NULL, (LPARAM)temp);
-
 }
 
 void Finder::open()
 {
 	if (!path)
 		return;
-
-	if (!is_file(path.selected_file)) {
-		open_proc();
-		return;
+	SmartFinder file;
+	if (file.find(path.selected_file)) {
+		if (file.is_file()) {
+			open_proc();
+		}
+		else if (file.is_directory()) {
+			path.main_path = path.selected_file + '\\';
+			update_listview();
+		}
 	}
-	path.main_path = path.selected_file + '\\';
-	update_listview();
 }
 
 void Finder::back_button()
@@ -151,7 +156,7 @@ void Finder::delete_item()
 
 	if (MessageBox(hWnd, local_ru::DeleteFileInfo,
 		local_ru::DeleteFileHeader, MB_ICONQUESTION | MB_YESNO) == IDYES) {
-		delete_file(path.selected_file);
+		_delete(path.selected_file);
 		update_listview();
 	}
 }
@@ -172,16 +177,17 @@ void Finder::resize_objects()
 	GetClientRect(hWnd, &WindowRT);
 	SetWindowPos(ListView, temp, WindowRT.left + 300, WindowRT.top + 45, WindowRT.right - 310, WindowRT.bottom - 55, NULL);
 	SetWindowPos(Tree, temp, WindowRT.left + 10, WindowRT.top + 45, WindowRT.left + 280, WindowRT.bottom - 55, NULL);
-	SetWindowPos(Edit, temp, WindowRT.left + 300, WindowRT.top + 10, WindowRT.right - 365, 25, NULL);
+	SetWindowPos(Edit, temp, WindowRT.left + 300, WindowRT.top + 10, WindowRT.right - 395, 25, NULL);
+	SetWindowPos(Button[2], temp, WindowRT.right - 95, WindowRT.top + 10, 30 , 25, NULL);
 	SetWindowPos(ComboBox, temp, WindowRT.right - 60, WindowRT.top + 10, 50, 200, NULL);
-}
-
-std::string * Finder::_get_file_info(const WIN32_FIND_DATA &_file) const
-{
-	return make_file_info(_file);
 }
 
 void Finder::show_info()
 {
 	DialogBoxParam(hInst, MAKEINTRESOURCE(ID_DLG_INFO), hWnd, (DLGPROC)DlgInfo, (LPARAM)this);
+}
+
+void Finder::refresh()
+{
+	update_listview();
 }

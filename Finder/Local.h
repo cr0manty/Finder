@@ -16,6 +16,7 @@ namespace local_ru
 	const char * const ErrorCNewDir			= "Ошибка при создании новой папки";
 	const char * const Error				= "Ошибка!";
 	const char * const ErrorDelete			= "Не удалось удалить объект!";
+	const char * const ErrorCopy			= "Не удалось копировать объект!";
 	const char * const MenuOpen				= "Открыть";
 	const char * const MenuCut				= "Вырезать";
 	const char * const MenuCopy				= "Копировать";

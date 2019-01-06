@@ -90,14 +90,19 @@ void Functional::_crete_objects()
 {
 	Edit = CreateWindow("edit", NULL, WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_READONLY | WS_BORDER,
 		0, 0, 0, 0, hWnd, (HMENU)ID_PATH_EDIT, hInst, NULL);
-	ComboBox = CreateWindow("combobox", NULL, WS_CHILD | WS_VISIBLE | CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | CB_SHOWDROPDOWN,
+	ComboBox = CreateWindow("combobox", NULL, WS_CHILD | WS_VISIBLE | CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | CB_SHOWDROPDOWN | WS_BORDER,
 		0, 0, 0, 0, hWnd, (HMENU)ID_DISKLIST_CB, NULL, NULL);
 
-	Button = new HWND[2];
+	Button = new HWND[3];
 	Button[0] = CreateWindow("button", "<-", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
 		10, 10, 50, 20, hWnd, (HMENU)ID_BACK_BUTTON, hInst, NULL);
 	Button[1] = CreateWindow("button", "->", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
 		60, 10, 50, 20, hWnd, (HMENU)ID_NEXT_BUTTON, hInst, NULL);
+	Button[2] = CreateWindow("button", "Refresh", WS_VISIBLE | WS_CHILD | BS_BITMAP | WS_BORDER,
+		50, 50, 80, 25, hWnd, (HMENU)ID_REFRESH_BTN, NULL, NULL);
+	HBITMAP hBitmap = (HBITMAP)LoadImage(hInst, MAKEINTRESOURCE(IDB_BITMAP1),
+		IMAGE_BITMAP, 0, 0, 1);
+	SendMessage(Button[2], BM_SETIMAGE, IMAGE_BITMAP, LPARAM(hBitmap));
 }
 
 void Functional::disk_list()
@@ -115,15 +120,15 @@ void Functional::disk_list()
 	
 }
 
-bool Functional::delete_file(const std::string &_delete)
+bool Functional::_delete(const std::string &_delete)
 {
 	SmartFinder file;
 
 	if (file.find(_delete)) {
-		if (!(file._get().dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE))
-			RemoveDirectory(_delete.c_str());
-		else if (file._get().dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE)
-			DeleteFile(_delete.c_str());
+		if (file.is_file())
+			boost::filesystem::remove(_delete);
+		else if (file.is_directory())
+			boost::filesystem::remove_all(_delete);
 		else {
 			MessageBox(NULL, local_ru::ErrorDelete, local_ru::Error, MB_OK);
 			return false;
@@ -151,28 +156,17 @@ bool Functional::_add_lw_item(const std::string *_item)
 	return true;
 }
 
-bool Functional::is_file(const std::string &_file)
-{
-	SmartFinder file;
-
-	if (file.find(_file)) {
-		if (!(file._get().dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE))
-			return true;
-	}
-	return false;
-}
-
 bool Functional::open_proc()
 {
-	STARTUPINFO si;
-	PROCESS_INFORMATION pi;
+	SHELLEXECUTEINFOA _shell;
 
-	ZeroMemory(&si, sizeof(si));
-	si.cb = sizeof(si);
-	ZeroMemory(&pi, sizeof(pi));
+	ZeroMemory(&_shell, sizeof(SHELLEXECUTEINFOA));
+	_shell.cbSize = sizeof(SHELLEXECUTEINFOA);
+	_shell.lpFile = path.selected_file.c_str();
 
-	if (CreateProcess(TEXT(path.selected_file.c_str()),
-		NULL, NULL, NULL, FALSE, NULL, NULL, NULL, &si, &pi))
+	_shell.fMask = SEE_MASK_DEFAULT;
+
+	if(ShellExecuteEx(&_shell))
 		return true;
 
 	return false;
@@ -241,63 +235,42 @@ Functional::Functional(HWND _hWnd) :
 	update_listview();
 }
 
-std::string Functional::file_name() const
-{
-	std::string temp;
-	int i = manip.file.rfind('\\');
-	while (i++ < manip.file.size())
-		temp += manip.file[i];
-
-	return temp;
-}
-
-bool Functional::find_same(const std::string &_name)
-{
-	SmartFinder file;
-
-	if (file.find(_name)) {
-		do {
-			if (_name == std::string(path.main_path + file._get().cFileName)) {
-				return true;
-			}
-		} while (file.next());
-	}
-	return false;
-}
-
 bool Functional::make_paste()
 {
 	if (!manip)
 		return false;
 
-	std::string temp = path.main_path + file_name();
+	int i = 1;
+	SmartFinder file;
 
-	if (!find_same(temp)) {
-		if (path.main_path == manip.path) {
-			int index = temp.rfind('.'), i = 1;
-			bool file = is_file(temp);
-
-			do {
-				if (file)
-					temp.insert(index, " (" + std::to_string(i++) + ")");
-				else
-					temp = temp + " (" + std::to_string(i++) + ")";
+	if (file.find(manip.file)) {
+		do {
+			if (file.is_file()) {
+				int index = manip.file.rfind('.');
+				manip.file.insert(index, " (" + std::to_string(i++) + ")");
 			}
-			while (find_same(temp));
-		}
-		if (CopyFile(manip.file.c_str(), temp.c_str(), TRUE)) {
-			if (manip.aDelete) {
-				if (!delete_file(manip.file))
-					return false;
-			}
-		}
-		else return false;
-		return true;
+			else if (file.is_directory())
+				manip.file = manip.file + " (" + std::to_string(i++) + ")";
+		} while (file.next());
 	}
-	else {
 
+	try {
+		if (file.is_file())
+			boost::filesystem::copy_file(manip.file, path.main_path, boost::filesystem::copy_option::fail_if_exists);
+		else if (file.is_directory())
+			boost::filesystem::copy_directory(manip.file, path.main_path);
 	}
-	return false;
+	catch (...) {
+		MessageBox(NULL, local_ru::ErrorCopy, local_ru::Error, MB_OK);
+		return false;
+	}
+
+	if (manip.aDelete) {
+		if (!_delete(manip.file))
+			return false;
+	}
+
+	return true;
 }
 
 Functional::Path::operator bool()
@@ -321,9 +294,7 @@ void Functional::update_listview()
 
 	if (file.find(buffer)) {
 		do {
-			if (!(file._get().dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) &&
-				!(file._get().dwFileAttributes &  FILE_ATTRIBUTE_REPARSE_POINT) &&
-				lstrcmp(file._get().cFileName, "..") && lstrcmp(file._get().cFileName, ".")) {
+			if (file.hidden()) {
 				_add_lw_item(make_file_info(file._get()));
 			}
 		} while (file.next());
