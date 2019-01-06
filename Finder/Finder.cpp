@@ -64,6 +64,49 @@ void Finder::open()
 	}
 }
 
+void Finder::create_link()
+{
+	std::string type = " (1).lnk";
+	IShellLink  *psl;
+	int amount = 1;
+	HRESULT hres;
+	SmartFinder file;
+	CoInitialize(NULL);
+	hres = CoCreateInstance(CLSID_ShellLink, NULL,
+		CLSCTX_INPROC_SERVER, IID_IShellLink, (void**)&psl);
+	if (SUCCEEDED(hres))
+	{
+		int i;
+		IPersistFile  *ppf;
+		psl->SetPath(path.selected_file.c_str());
+		i = path.selected_file.rfind('.');
+
+		if (i > path.selected_file.size() - 5 && i != std::string::npos) {
+
+			path.selected_file.erase(i);
+			
+		}
+
+		if (file.find(path.selected_file + type)) {
+			do {
+				type = " (" + std::to_string(amount++) + ").lnk";
+
+			} while (file.next());
+		}
+		hres = psl->QueryInterface(IID_IPersistFile, (void**)&ppf);
+		if (SUCCEEDED(hres))
+		{
+			wchar_t  wsz[MAX_PATH];
+			MultiByteToWideChar(CP_ACP, 0, (path.selected_file + type).c_str(), -1, wsz, MAX_PATH);
+			hres = ppf->Save(wsz, true);
+			ppf->Release();
+		}
+		psl->Release();
+		CoUninitialize();
+		update_listview();
+	}
+}
+
 void Finder::back_button()
 {
 	if (path.main_path.size() <= 4)

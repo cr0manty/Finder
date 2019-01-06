@@ -49,6 +49,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 
 		case ID_LINK_ITEM:
+			main->create_link();
 			break;
 
 		case ID_REFRESH_BTN:
@@ -108,7 +109,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 BOOL CALLBACK DlgInfo(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	HWND Object[6], edit;
+	HWND Object[6];
 	WIN32_FIND_DATA file;
 	std::string *temp;
 	Finder *main;

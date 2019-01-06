@@ -30,5 +30,6 @@ namespace local_ru
 	const char * const MenuLink				= "Создать ярлык";
 	const char * const DefaultTextFile		= "Новый текстовый документ";
 	const char * const DefaultFolder		= "Новая папка";
+	const char * const FileLink				= " - Ярлык";
 
 }

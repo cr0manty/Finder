@@ -1,5 +1,6 @@
 #pragma once
 #include "Functional.h"
+#include <ShlObj.h>
 
 class Finder : public Functional
 {
@@ -12,6 +13,7 @@ public:
 	void rename();
 
 	void open();
+	void create_link();
 	void back_button();
 	void next_button();
 	void select_item();
