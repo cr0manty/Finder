@@ -81,21 +81,17 @@ void Finder::create_link()
 		psl->SetPath(path.selected_file.c_str());
 		i = path.selected_file.rfind('.');
 
-		if (i > path.selected_file.size() - 5 && i != std::string::npos) {
-
+		if (i > path.selected_file.size() - 5 && i != std::string::npos)
 			path.selected_file.erase(i);
 			
-		}
-
 		if (file.find(path.selected_file + type)) {
 			do {
 				type = " (" + std::to_string(amount++) + ").lnk";
-
 			} while (file.next());
 		}
+
 		hres = psl->QueryInterface(IID_IPersistFile, (void**)&ppf);
-		if (SUCCEEDED(hres))
-		{
+		if (SUCCEEDED(hres)) {
 			wchar_t  wsz[MAX_PATH];
 			MultiByteToWideChar(CP_ACP, 0, (path.selected_file + type).c_str(), -1, wsz, MAX_PATH);
 			hres = ppf->Save(wsz, true);
