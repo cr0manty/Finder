@@ -1,9 +1,10 @@
 #include "Finder.h"
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT __stdcall WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static Finder *main;
 	LPNMHDR lpnmHdr;
+
 	switch (message)
 	{
 	case WM_CREATE:
@@ -16,7 +17,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_NOTIFY:
 		lpnmHdr = (LPNMHDR)lParam;
-
 		switch (lpnmHdr->code)
 		{
 		case NM_DBLCLK:
@@ -120,7 +120,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-BOOL CALLBACK DlgInfo(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
+BOOL __stdcall DlgInfo(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	HWND Object[6];
 	HWND Object_info[6];
@@ -176,7 +176,7 @@ BOOL CALLBACK DlgInfo(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-BOOL CALLBACK DlgAbout(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
+BOOL __stdcall DlgAbout(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	HWND obj;
 	switch (msg)

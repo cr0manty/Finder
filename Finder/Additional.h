@@ -1,20 +1,5 @@
 #pragma once
-#include <Windows.h>
-#include <string>
-#include "Local.h"
-#include "resource.h"
-#include <commctrl.h>
-
-#pragma comment(lib, "ComCtl32.Lib")
-
-static HINSTANCE hInst;
-static LPCTSTR wnd_class = "Finder";
-
-ATOM MyRegisterClass(HINSTANCE);
-BOOL InitInstance(HINSTANCE, int);
-LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-BOOL CALLBACK DlgInfo(HWND, UINT, WPARAM, LPARAM);
-BOOL CALLBACK DlgAbout(HWND, UINT, WPARAM, LPARAM);
+#include "Objects.h"
 
 class Disk 
 {
@@ -51,25 +36,3 @@ struct Manip
 	void clear();
 };
 
-struct Objects
-{
-	HWND ListView;
-	HWND Edit;
-	HWND ComboBox;
-	HWND *Button;
-	HWND Tree;
-	HWND Search;
-	HMENU Menu;
-	HWND hWnd;
-	const int number_colum;
-
-	Objects(HWND, int);
-
-	void resize();
-	~Objects();
-private:
-	void _create_listview();
-	void _create_tree();
-	void _crete_objects();
-	void set_listviw_colum();
-};

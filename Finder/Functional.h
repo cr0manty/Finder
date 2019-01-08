@@ -2,13 +2,12 @@
 #include "SmartFinder.h"
 #include <boost/filesystem.hpp>
 
-class Functional
+class Functional : public Objects
 {
-	HWND temp_edit;
+	std::string file_name(const std::string &);
 protected:
 	int item_count;
-
-	Objects *obj;
+	HWND temp_edit;
 	Disk *disks;
 	Path path;
 	Manip manip;
@@ -23,8 +22,8 @@ protected:
 	bool open_proc();
 	bool make_paste();
 	void update_listview();
-	bool name_change(int);
-
+	bool start_rename(int);
+	bool end_rename(int);
 public:
 	std::string* make_file_info(const WIN32_FIND_DATA &) const;
 	~Functional();

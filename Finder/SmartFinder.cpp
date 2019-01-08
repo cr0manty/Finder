@@ -5,6 +5,12 @@ SmartFinder::SmartFinder() :
 {
 }
 
+SmartFinder::SmartFinder(const std::string &_path) :
+	Find(NULL)
+{
+	find(_path);
+}
+
 bool SmartFinder::find(const std::string &_name)
 {
 	Find = FindFirstFile(_name.c_str(), &file);

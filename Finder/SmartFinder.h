@@ -8,6 +8,7 @@ class SmartFinder
 
 public:
 	SmartFinder();
+	SmartFinder(const std::string &);
 
 	bool find(const std::string &);
 	bool next();

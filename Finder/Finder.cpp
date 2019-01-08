@@ -52,7 +52,7 @@ void Finder::create_folder()
 
 void Finder::rename()
 {
-	name_change(path.selected_index);
+	start_rename(path.selected_index);
 }
 
 void Finder::open()
@@ -133,9 +133,9 @@ void Finder::select_item()
 {
 	char *temp = new char[200];
 	temp[0] = 0;
-	int index = ListView_GetNextItem(obj->ListView,
+	int index = ListView_GetNextItem(ListView,
 		-1, LVNI_ALL | LVNI_SELECTED);
-	ListView_GetItemText(obj->ListView, index, 0, temp, 200);
+	ListView_GetItemText(ListView, index, 0, temp, 200);
 
 	if (!temp)
 		goto end;
@@ -151,20 +151,20 @@ void Finder::context_menu(LPARAM lParam)
 	char *temp = new char[200];
 	_init_menu();
 
-	TrackPopupMenu(obj->Menu, TPM_RIGHTBUTTON |
+	TrackPopupMenu(Menu, TPM_RIGHTBUTTON |
 		TPM_TOPALIGN |
 		TPM_LEFTALIGN,
 		LOWORD(lParam),
-		HIWORD(lParam), 0, obj->hWnd, NULL);
+		HIWORD(lParam), 0, hWnd, NULL);
 
-	int index = ListView_GetNextItem(obj->ListView,
+	int index = ListView_GetNextItem(ListView,
 		-1, LVNI_ALL | LVNI_SELECTED);
-	ListView_GetItemText(obj->ListView, index, 0, temp, 200);
+	ListView_GetItemText(ListView, index, 0, temp, 200);
 
 	path.selected_file = path.main_path + temp;
 	delete[] temp;
 
-	DestroyMenu(obj->Menu);
+	DestroyMenu(Menu);
 }
 
 void Finder::file_manip(bool _cut)
@@ -187,7 +187,7 @@ void Finder::disk_change(WPARAM wParam)
 		return;
 
 	char *temp = new char[6];
-	GetDlgItemText(obj->hWnd, ID_DISKLIST_CB, temp, 5);
+	GetDlgItemText(hWnd, ID_DISKLIST_CB, temp, 5);
 	path.main_path = temp;
 	update_listview();
 
@@ -199,7 +199,7 @@ void Finder::delete_item()
 	if (!path)
 		return;
 
-	if (MessageBox(obj->hWnd, local_ru::DeleteFileInfo,
+	if (MessageBox(NULL, local_ru::DeleteFileInfo,
 		local_ru::DeleteFileHeader, MB_ICONQUESTION | MB_YESNO) == IDYES) {
 		_delete(path.selected_file);
 		update_listview();
@@ -216,12 +216,12 @@ void Finder::paste()
 
 void Finder::resize_objects()
 {
-	obj->resize();
+	resize();
 }
 
 void Finder::show_info()
 {
-	DialogBoxParam(hInst, MAKEINTRESOURCE(ID_DLG_INFO), obj->hWnd, (DLGPROC)DlgInfo, (LPARAM)this);
+	DialogBoxParam(hInst, MAKEINTRESOURCE(ID_DLG_INFO), hWnd, (DLGPROC)DlgInfo, (LPARAM)this);
 }
 
 void Finder::refresh()
@@ -234,17 +234,17 @@ void Finder::tree_select()
 	if (!this)
 		return;
 	
-	HTREEITEM item = TreeView_GetNextItem(obj->Tree, NULL, TVGN_CARET);
-	TreeView_Expand(obj->Tree, item, TVE_EXPAND);
+	HTREEITEM item = TreeView_GetNextItem(Tree, NULL, TVGN_CARET);
+	TreeView_Expand(Tree, item, TVE_EXPAND);
 	TVITEMEX tv;
 	tv.mask = TVIF_PARAM;
 	tv.hItem = item;
-	TreeView_GetItem(obj->Tree, &tv);
+	TreeView_GetItem(Tree, &tv);
 
 	update_listview();
 }
 
 void Finder::show_about()
 {
-	DialogBox(hInst, MAKEINTRESOURCE(ID_ABOUT), obj->hWnd, (DLGPROC)DlgAbout);
+	DialogBox(hInst, MAKEINTRESOURCE(ID_ABOUT), hWnd, (DLGPROC)DlgAbout);
 }
