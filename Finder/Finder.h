@@ -6,7 +6,7 @@ class Finder : public Functional
 {
 public:
 	Finder(HWND);
-	Functional::Path _get_path() const;
+	Path _get_path() const;
 
 	void create_txt();
 	void create_folder();
@@ -26,4 +26,6 @@ public:
 	void resize_objects();
 	void show_info();
 	void refresh();
+	void tree_select();
+	void show_about();
 };

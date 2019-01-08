@@ -2,10 +2,11 @@
 
 namespace local_ru
 {
+	static std::string header[5]			= { (char*)"Имя", (char*)"Дата изменения", (char*)"Тип", (char*)"Размер" , (char*)"Дата создания" };
+	const char * const PathInfo				= "Путь";
+	static LPCTSTR window_name				= "Прооводник";
 	const char * const DeleteFileInfo 		= "Вы уверены что хотите удалить этот файл?";
 	const char * const DeleteFileHeader		= "Удалить файл?";
-	static std::string header[5]			= { (char*)"Имя", (char*)"Дата изменения", (char*)"Тип", (char*)"Размер" , (char*)"Дата создания" };
-	static LPCTSTR window_name				= "Прооводник";
 	const char * const Folder				= "Папка с файлами";
 	const char * const BTN_CREATE			= "Создать";
 	const char * const BTN_DELETE			= "Удалить";
@@ -31,5 +32,11 @@ namespace local_ru
 	const char * const DefaultTextFile		= "Новый текстовый документ";
 	const char * const DefaultFolder		= "Новая папка";
 	const char * const FileLink				= " - Ярлык";
+	const char * const ErrorEmptyName		= "Имя файла не может быть пустым!";
+	const char * const DialogInfoName		= "Свойства";
+	const char * const DialogAboutName		= "О программе";
+	const char * const Copyright			= "Харьковский национальный университет радиоэлектроники\nКурсовая работа по системному программированию\nТема: Реализация проводника для системы Windows\nСдутент группы КИУКИ - 17 - 8\nДудка Денис\n\n\nХарьков 2018";
+	
+
 
 }

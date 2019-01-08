@@ -1,6 +1,7 @@
 #include "SmartFinder.h"
 
-SmartFinder::SmartFinder()
+SmartFinder::SmartFinder() :
+	Find(NULL)
 {
 }
 

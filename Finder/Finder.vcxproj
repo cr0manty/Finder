@@ -73,6 +73,9 @@
     <IncludePath>C:\boost_1_69_0;$(IncludePath)</IncludePath>
     <LibraryPath>C:\boost_1_69_0\libs_c\x64\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LibraryPath>C:\boost_1_69_0\libs_c\х32\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -121,6 +124,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Additional.cpp" />
     <ClCompile Include="Finder.cpp" />
     <ClCompile Include="Functional.cpp" />
     <ClCompile Include="MsgWork.cpp" />
@@ -128,6 +132,7 @@
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Additional.h" />
     <ClInclude Include="Finder.h" />
     <ClInclude Include="Functional.h" />
     <ClInclude Include="Local.h" />
@@ -136,6 +141,9 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Finder.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="finder.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

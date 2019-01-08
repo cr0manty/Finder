@@ -1,108 +1,58 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "Functional.h"
-
-int Functional::set_listviw_colum()
-{
-	RECT rcl;
-	GetClientRect(ListView, &rcl);
-	int index = -1;
-
-	LVCOLUMN lvc;
-	lvc.mask = LVCF_TEXT | LVCF_WIDTH;
-	lvc.cx = (rcl.right - rcl.left) / number_colum;
-	lvc.cchTextMax = 1000;
-
-	for (int i = 0; i < number_colum; i++)
-	{
-		lvc.pszText = (LPSTR)local_ru::header[i].c_str();
-		index = ListView_InsertColumn(ListView, i, &lvc);
-		if (index == -1) break;
-	}
-
-	return index;
-}
 
 void Functional::_init_menu()
 {
 	UINT enabled = (manip) ? MF_ENABLED : MF_DISABLED;
-	Menu = CreatePopupMenu();
+	obj->Menu = CreatePopupMenu();
 	HMENU AdditionalMenu = CreatePopupMenu();
 
-	AppendMenu(Menu, MFT_STRING, ID_OPEN_ITEM, local_ru::MenuOpen);
-	AppendMenu(Menu, MFT_SEPARATOR, 0, NULL);
-	AppendMenu(Menu, MFT_STRING | MF_POPUP, (UINT)AdditionalMenu, local_ru::MenuCreate);
+	AppendMenu(obj->Menu, MFT_STRING, ID_OPEN_ITEM, local_ru::MenuOpen);
+	AppendMenu(obj->Menu, MFT_SEPARATOR, 0, NULL);
+	AppendMenu(obj->Menu, MFT_STRING | MF_POPUP, (UINT)AdditionalMenu, local_ru::MenuCreate);
 	{
 		AppendMenu(AdditionalMenu, MFT_STRING, ID_CREATE_FOLDER, local_ru::MenuCreateFile);
 		AppendMenu(AdditionalMenu, MFT_SEPARATOR, 0, NULL);
 		AppendMenu(AdditionalMenu, MFT_STRING, ID_CREATE_TEXT_ITEM, local_ru::MenuCreateTxt);
 	}
-	AppendMenu(Menu, MFT_SEPARATOR, 0, NULL);
-	AppendMenu(Menu, MFT_STRING, ID_CUT_ITEM, local_ru::MenuCut);
-	AppendMenu(Menu, MFT_STRING, ID_COPY_ITEM, local_ru::MenuCopy);
-	AppendMenu(Menu, MFT_STRING | enabled, ID_PASTE_ITEM, local_ru::MenuPaste);
-	AppendMenu(Menu, MFT_SEPARATOR, 0, NULL);
-	AppendMenu(Menu, MFT_STRING, ID_LINK_ITEM, local_ru::MenuLink);
-	AppendMenu(Menu, MFT_STRING, ID_DELETE_ITEM, local_ru::MenuDelete);
-	AppendMenu(Menu, MFT_STRING, ID_RENAME_ITEM, local_ru::MenuRename);
+	AppendMenu(obj->Menu, MFT_SEPARATOR, 0, NULL);
+	AppendMenu(obj->Menu, MFT_STRING, ID_CUT_ITEM, local_ru::MenuCut);
+	AppendMenu(obj->Menu, MFT_STRING, ID_COPY_ITEM, local_ru::MenuCopy);
+	AppendMenu(obj->Menu, MFT_STRING | enabled, ID_PASTE_ITEM, local_ru::MenuPaste);
+	AppendMenu(obj->Menu, MFT_SEPARATOR, 0, NULL);
+	AppendMenu(obj->Menu, MFT_STRING, ID_LINK_ITEM, local_ru::MenuLink);
+	AppendMenu(obj->Menu, MFT_STRING, ID_DELETE_ITEM, local_ru::MenuDelete);
+	AppendMenu(obj->Menu, MFT_STRING, ID_RENAME_ITEM, local_ru::MenuRename);
 
-	AppendMenu(Menu, MFT_SEPARATOR, 0, NULL);
-	AppendMenu(Menu, MFT_STRING, ID_INFO_ITEM, local_ru::MenuInfo);
+	AppendMenu(obj->Menu, MFT_SEPARATOR, 0, NULL);
+	AppendMenu(obj->Menu, MFT_STRING, ID_INFO_ITEM, local_ru::MenuInfo);
 }
 
-void Functional::_create_listview()
+void Functional::_init_tree()
 {
-	const int colum_amount = 5;
-	INITCOMMONCONTROLSEX icex;
-	icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
-	icex.dwICC = ICC_LISTVIEW_CLASSES;
-	InitCommonControlsEx(&icex);
-	RECT WindowRT;
-	GetClientRect(hWnd, &WindowRT);
+	TV_INSERTSTRUCT tvInsert;
+	tvInsert.hParent = nullptr;
+	tvInsert.hInsertAfter = TVI_ROOT;
+	tvInsert.item.mask = TVIF_TEXT | TVIF_PARAM;
+	tvInsert.item.pszText = (LPSTR)"Desktop";
+	tvInsert.item.lParam = (LPARAM)("Desktop");
+	HTREEITEM hDesktop = TreeView_InsertItem(obj->Tree, &tvInsert);
 
-	ListView = CreateWindow(WC_LISTVIEW, NULL,
-		WS_VISIBLE | WS_CHILD | WS_BORDER | LVS_REPORT | LVS_EDITLABELS,
-		WindowRT.left + 300, WindowRT.top + 110, WindowRT.right - 310, WindowRT.bottom - 120,
-		hWnd, (HMENU)ID_LISTVIEW, GetModuleHandle(NULL), NULL);
+	tvInsert.hParent = hDesktop;
+	tvInsert.hInsertAfter = TVI_LAST;
+	tvInsert.item.pszText = (LPSTR)"My Computer";
+	tvInsert.item.lParam = (LPARAM)("MyComputer");
+	HTREEITEM hMyComputer = TreeView_InsertItem(obj->Tree, &tvInsert);
 
-	ListView_SetExtendedListViewStyleEx(ListView, 0, LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+	for (int i = 0; i < disks->disk_amount; i++) {
+		tvInsert.hParent = hMyComputer;
+		tvInsert.item.pszText = disks->_get_disk(i);
+		tvInsert.item.lParam = (LPARAM)disks->_get_disk(i);
+		HTREEITEM hDrive = TreeView_InsertItem(obj->Tree, &tvInsert);
+		TreeView_Expand(obj->Tree, hMyComputer, TVE_EXPAND);
+		TreeView_SelectItem(obj->Tree, hMyComputer);
+	}
 
-	set_listviw_colum();
-	ShowWindow(ListView, SW_SHOWDEFAULT);
-}
-
-void Functional::_create_tree()
-{
-	InitCommonControls();
-
-	Tree = CreateWindowEx(0,
-		WC_TREEVIEW,
-		TEXT("Tree View"),
-		WS_VISIBLE | WS_CHILD | WS_BORDER | TVS_HASLINES,
-		0, 0, 0, 0,
-		hWnd,
-		(HMENU)ID_TREEVIEW,
-		hInst,
-		NULL);
-
-	ShowWindow(Tree, SW_SHOWDEFAULT);
-}
-
-void Functional::_crete_objects()
-{
-	Edit = CreateWindow("edit", NULL, WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_READONLY | WS_BORDER,
-		0, 0, 0, 0, hWnd, (HMENU)ID_PATH_EDIT, hInst, NULL);
-	ComboBox = CreateWindow("combobox", NULL, WS_CHILD | WS_VISIBLE | CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | CB_SHOWDROPDOWN | WS_BORDER,
-		0, 0, 0, 0, hWnd, (HMENU)ID_DISKLIST_CB, NULL, NULL);
-
-	Button = new HWND[3];
-	Button[0] = CreateWindow("button", "<-", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-		10, 10, 50, 20, hWnd, (HMENU)ID_BACK_BUTTON, hInst, NULL);
-	Button[1] = CreateWindow("button", "->", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-		60, 10, 50, 20, hWnd, (HMENU)ID_NEXT_BUTTON, hInst, NULL);
-	Button[2] = CreateWindow("button", "Refresh", WS_VISIBLE | WS_CHILD | BS_BITMAP | WS_BORDER,
-		50, 50, 80, 25, hWnd, (HMENU)ID_REFRESH_BTN, NULL, NULL);
-	HBITMAP hBitmap = (HBITMAP)LoadImage(hInst, MAKEINTRESOURCE(IDB_BITMAP1),
-		IMAGE_BITMAP, 0, 0, 1);
-	SendMessage(Button[2], BM_SETIMAGE, IMAGE_BITMAP, LPARAM(hBitmap));
 }
 
 void Functional::disk_list()
@@ -111,12 +61,14 @@ void Functional::disk_list()
 
 	GetLogicalDriveStrings(sizeof(arr), arr);
 	b = arr;
+	disks = new Disk(strlen(arr) / 3);
 
 	while (*b != 0) {
-		SendMessage(ComboBox, CB_ADDSTRING, NULL, (LPARAM)b);
+		SendMessage(obj->ComboBox, CB_ADDSTRING, NULL, (LPARAM)b);
+		disks->add_disk(b);
 		b += 4;
 	}
-	SendMessage(ComboBox, CB_SETCURSEL, NULL, (LPARAM)1);
+	SendMessage(obj->ComboBox, CB_SETCURSEL, NULL, (LPARAM)1);
 	
 }
 
@@ -139,7 +91,7 @@ bool Functional::_delete(const std::string &_delete)
 
 bool Functional::_add_lw_item(const std::string *_item)
 {
-	int iLastIndex = ListView_GetItemCount(ListView);
+	int iLastIndex = ListView_GetItemCount(obj->ListView);
 
 	LVITEM lvi;
 	lvi.mask = LVIF_TEXT;
@@ -148,28 +100,17 @@ bool Functional::_add_lw_item(const std::string *_item)
 	lvi.pszText = (LPSTR)_item[0].c_str();
 	lvi.iSubItem = 0;
 
-	if (ListView_InsertItem(ListView, &lvi) == -1)
+	if (ListView_InsertItem(obj->ListView, &lvi) == -1)
 		return false;
-	for (int i = 1; i < number_colum; i++)
-		ListView_SetItemText(ListView, iLastIndex, i, (LPSTR)_item[i].c_str());
+	for (int i = 1; i < obj->number_colum; i++)
+		ListView_SetItemText(obj->ListView, iLastIndex, i, (LPSTR)_item[i].c_str());
 
 	return true;
 }
 
 bool Functional::open_proc()
 {
-	SHELLEXECUTEINFOA _shell;
-
-	ZeroMemory(&_shell, sizeof(SHELLEXECUTEINFOA));
-	_shell.cbSize = sizeof(SHELLEXECUTEINFOA);
-	_shell.lpFile = path.selected_file.c_str();
-
-	_shell.fMask = SEE_MASK_DEFAULT;
-
-	if(ShellExecuteEx(&_shell))
-		return true;
-
-	return false;
+	return ShellExecute(NULL, "open", path.selected_file.c_str(), NULL, NULL, SW_SHOWNORMAL);
 }
 
 std::string * Functional::make_file_info(const WIN32_FIND_DATA &file) const
@@ -226,12 +167,12 @@ std::string * Functional::make_file_info(const WIN32_FIND_DATA &file) const
 }
 
 Functional::Functional(HWND _hWnd) :
-	path("C:\\", path.main_path), hWnd(_hWnd), number_colum(5)
+	path("C:\\", path.main_path)
 {
-	_create_listview();
-	_create_tree();
-	_crete_objects();
+	obj = new Objects(_hWnd, 4);
+	
 	disk_list();
+	_init_tree();
 	update_listview();
 }
 
@@ -242,16 +183,15 @@ bool Functional::make_paste()
 
 	int i = 1;
 	SmartFinder file;
+	std::string temp = manip.file;
 
-	if (file.find(manip.file)) {
-		do {
-			if (file.is_file()) {
-				int index = manip.file.rfind('.');
-				manip.file.insert(index, " (" + std::to_string(i++) + ")");
-			}
-			else if (file.is_directory())
-				manip.file = manip.file + " (" + std::to_string(i++) + ")";
-		} while (file.next());
+	while (file.find(temp)) {
+		if (file.is_file()) {
+			int index = temp.rfind('.');
+			temp.insert(index, " (" + std::to_string(i++) + ")");
+		}
+		else if (file.is_directory())
+			temp += " (" + std::to_string(i++) + ")";
 	}
 
 	try {
@@ -273,23 +213,13 @@ bool Functional::make_paste()
 	return true;
 }
 
-Functional::Path::operator bool()
-{
-	return (selected_file != main_path && selected_file.size());
-}
-
-Functional::Path::Path(const std::string &_main, const std::string &_next) :
-	main_path(_main), next_path(_next)
-{
-}
-
 void Functional::update_listview()
 {
 	std::string buffer;
 	SmartFinder file;
 
-	SetWindowText(Edit, path.main_path.c_str());
-	ListView_DeleteAllItems(ListView);
+	SetWindowText(obj->Edit, path.main_path.c_str());
+	ListView_DeleteAllItems(obj->ListView);
 	buffer = path.main_path + "*.*";
 
 	if (file.find(buffer)) {
@@ -299,81 +229,23 @@ void Functional::update_listview()
 			}
 		} while (file.next());
 	}
+
+	item_count = ListView_GetItemCount(obj->ListView);
+}
+
+bool Functional::name_change(int _index)
+{
+	char *temp = new char[200];
+	temp_edit = ListView_EditLabel(obj->ListView, _index);
+	if(!temp_edit)
+		MessageBox(NULL, local_ru::ErrorEmptyName, local_ru::Error, MB_OK);
+
+	return true;
 }
 
 Functional::~Functional()
 {
-	DestroyMenu(Menu);
-	DestroyWindow(Edit);
-	DestroyWindow(Button[0]);
-	DestroyWindow(Button[1]);
-	DestroyWindow(Tree);
-	DestroyWindow(ListView);
-	DestroyWindow(ComboBox);
-	DestroyWindow(hWnd);
-
-	delete[] Button;
+	delete disks;
+	delete obj;
 }
 
-Functional::Manip::Manip()
-{
-}
-
-Functional::Manip::Manip(const std::string &_buffer, const std::string &_path, bool _cut) :
-	file(_buffer), aDelete(_cut), path(_path)
-{
-}
-
-Functional::Manip::operator bool()
-{
-	return file.size();
-}
-
-void Functional::Manip::clear()
-{
-	file.clear();
-	aDelete = false;
-}
-
-ATOM MyRegisterClass(HINSTANCE hInstance)
-{
-	WNDCLASSEX wcex;
-	wcex.cbSize = sizeof(WNDCLASSEX);
-	wcex.style = CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc = (WNDPROC)WndProc;
-	wcex.cbClsExtra = 0;
-	wcex.cbWndExtra = 0;
-	wcex.hInstance = hInstance;
-	wcex.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground = CreateSolidBrush(RGB(240, 240, 240));
-	wcex.lpszMenuName = NULL;
-	wcex.lpszClassName = wnd_class;
-	wcex.hIconSm = NULL;
-
-	return RegisterClassEx(&wcex);
-}
-
-BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
-{
-	HWND hWnd;
-	hInst = hInstance;
-	hWnd = CreateWindow(wnd_class,
-		local_ru::window_name,
-		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		NULL,
-		NULL,
-		hInstance,
-		NULL);
-
-	if (!hWnd)
-		return FALSE;
-
-	ShowWindow(hWnd, nCmdShow);
-	UpdateWindow(hWnd);
-	return TRUE;
-}

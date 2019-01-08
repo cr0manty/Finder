@@ -1,51 +1,58 @@
 #include "Finder.h"
+#include <fstream>
 
 Finder::Finder(HWND _hWnd) :
 	Functional(_hWnd)
 {
 }
 
-Functional::Path Finder::_get_path() const
+Path Finder::_get_path() const
 {
 	return path;
 }
 
 void Finder::create_txt()
 {
-	int i = 2;
+	int i = 1;
 	std::string additional = ".txt";
-	SmartFinder file;
-	if (file.find(path.main_path + local_ru::DefaultTextFile + additional))
-		do {
+	SmartFinder find;
+	while (find.find(path.main_path + local_ru::DefaultTextFile + additional))
 			additional = " (" + std::to_string(i++) + ").txt";
-		} while (file.next());
 	additional = path.main_path + local_ru::DefaultTextFile + additional;
+	try {
+		std::ofstream file(additional);
+		file.close();
+	}
+	catch (...) {
+		return;
+	}
 
-	if (CreateFile(additional.c_str(), NULL, NULL, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL))
-		update_listview();
+	update_listview();
 }
 
 void Finder::create_folder()
 {
-	int i = 2;
+	int i = 1;
 	std::string additional;
 	SmartFinder file;
 
-	if (file.find(path.main_path + local_ru::DefaultFolder + additional))
-		do {
+	while (file.find(path.main_path + local_ru::DefaultFolder + additional))
 			additional = " (" + std::to_string(i++) + ")";
-		} while (file.next());
 	additional = path.main_path + local_ru::DefaultFolder + additional;
 
-	if(CreateDirectory(additional.c_str(),NULL))
-		update_listview();
+	try {
+		boost::filesystem::create_directory(additional);
+	}
+	catch (...) {
+		return;
+	}
+
+	update_listview();
 }
 
 void Finder::rename()
 {
-	char *temp = new char[200];
-	HWND edit = ListView_GetEditControl(ListView);
-	SendMessage(edit, EM_GETLINE, NULL, (LPARAM)temp);
+	name_change(path.selected_index);
 }
 
 void Finder::open()
@@ -68,7 +75,7 @@ void Finder::create_link()
 {
 	std::string type = " (1).lnk";
 	IShellLink  *psl;
-	int amount = 1;
+	int amount = 2;
 	HRESULT hres;
 	SmartFinder file;
 	CoInitialize(NULL);
@@ -84,11 +91,9 @@ void Finder::create_link()
 		if (i > path.selected_file.size() - 5 && i != std::string::npos)
 			path.selected_file.erase(i);
 			
-		if (file.find(path.selected_file + type)) {
-			do {
+		while (file.find(path.selected_file + type)) {
 				type = " (" + std::to_string(amount++) + ").lnk";
-			} while (file.next());
-		}
+			}
 
 		hres = psl->QueryInterface(IID_IPersistFile, (void**)&ppf);
 		if (SUCCEEDED(hres)) {
@@ -128,15 +133,16 @@ void Finder::select_item()
 {
 	char *temp = new char[200];
 	temp[0] = 0;
-	int index = ListView_GetNextItem(ListView,
+	int index = ListView_GetNextItem(obj->ListView,
 		-1, LVNI_ALL | LVNI_SELECTED);
-	ListView_GetItemText(ListView, index, 0, temp, 200);
+	ListView_GetItemText(obj->ListView, index, 0, temp, 200);
 
-	if (!temp) 
+	if (!temp)
 		goto end;
 
+	path.selected_index = index;
 	path.selected_file = path.main_path + temp;
-	end:
+end:
 	delete[] temp;
 }
 
@@ -145,20 +151,20 @@ void Finder::context_menu(LPARAM lParam)
 	char *temp = new char[200];
 	_init_menu();
 
-	TrackPopupMenu(Menu, TPM_RIGHTBUTTON |
+	TrackPopupMenu(obj->Menu, TPM_RIGHTBUTTON |
 		TPM_TOPALIGN |
 		TPM_LEFTALIGN,
 		LOWORD(lParam),
-		HIWORD(lParam), 0, hWnd, NULL);
+		HIWORD(lParam), 0, obj->hWnd, NULL);
 
-	int index = ListView_GetNextItem(ListView,
+	int index = ListView_GetNextItem(obj->ListView,
 		-1, LVNI_ALL | LVNI_SELECTED);
-	ListView_GetItemText(ListView, index, 0, temp, 200);
+	ListView_GetItemText(obj->ListView, index, 0, temp, 200);
 
 	path.selected_file = path.main_path + temp;
 	delete[] temp;
 
-	DestroyMenu(Menu);
+	DestroyMenu(obj->Menu);
 }
 
 void Finder::file_manip(bool _cut)
@@ -181,7 +187,7 @@ void Finder::disk_change(WPARAM wParam)
 		return;
 
 	char *temp = new char[6];
-	GetDlgItemText(hWnd, ID_DISKLIST_CB, temp, 5);
+	GetDlgItemText(obj->hWnd, ID_DISKLIST_CB, temp, 5);
 	path.main_path = temp;
 	update_listview();
 
@@ -193,7 +199,7 @@ void Finder::delete_item()
 	if (!path)
 		return;
 
-	if (MessageBox(hWnd, local_ru::DeleteFileInfo,
+	if (MessageBox(obj->hWnd, local_ru::DeleteFileInfo,
 		local_ru::DeleteFileHeader, MB_ICONQUESTION | MB_YESNO) == IDYES) {
 		_delete(path.selected_file);
 		update_listview();
@@ -210,23 +216,35 @@ void Finder::paste()
 
 void Finder::resize_objects()
 {
-	RECT WindowRT;
-	HWND temp = NULL;
-
-	GetClientRect(hWnd, &WindowRT);
-	SetWindowPos(ListView, temp, WindowRT.left + 300, WindowRT.top + 45, WindowRT.right - 310, WindowRT.bottom - 55, NULL);
-	SetWindowPos(Tree, temp, WindowRT.left + 10, WindowRT.top + 45, WindowRT.left + 280, WindowRT.bottom - 55, NULL);
-	SetWindowPos(Edit, temp, WindowRT.left + 300, WindowRT.top + 10, WindowRT.right - 395, 25, NULL);
-	SetWindowPos(Button[2], temp, WindowRT.right - 95, WindowRT.top + 10, 30 , 25, NULL);
-	SetWindowPos(ComboBox, temp, WindowRT.right - 60, WindowRT.top + 10, 50, 200, NULL);
+	obj->resize();
 }
 
 void Finder::show_info()
 {
-	DialogBoxParam(hInst, MAKEINTRESOURCE(ID_DLG_INFO), hWnd, (DLGPROC)DlgInfo, (LPARAM)this);
+	DialogBoxParam(hInst, MAKEINTRESOURCE(ID_DLG_INFO), obj->hWnd, (DLGPROC)DlgInfo, (LPARAM)this);
 }
 
 void Finder::refresh()
 {
 	update_listview();
+}
+
+void Finder::tree_select()
+{
+	if (!this)
+		return;
+	
+	HTREEITEM item = TreeView_GetNextItem(obj->Tree, NULL, TVGN_CARET);
+	TreeView_Expand(obj->Tree, item, TVE_EXPAND);
+	TVITEMEX tv;
+	tv.mask = TVIF_PARAM;
+	tv.hItem = item;
+	TreeView_GetItem(obj->Tree, &tv);
+
+	update_listview();
+}
+
+void Finder::show_about()
+{
+	DialogBox(hInst, MAKEINTRESOURCE(ID_ABOUT), obj->hWnd, (DLGPROC)DlgAbout);
 }

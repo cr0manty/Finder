@@ -1,6 +1,5 @@
 #pragma once
-#include <Windows.h>
-#include <string>
+#include "Additional.h"
 
 class SmartFinder
 {
@@ -15,6 +14,7 @@ public:
 	bool is_file() const;
 	bool is_directory() const;
 	bool hidden() const;
+
 	WIN32_FIND_DATA _get() const;
 	~SmartFinder();
 };
