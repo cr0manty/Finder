@@ -3,6 +3,7 @@
 
 class Disk 
 {
+	char **disk_path;
 	char **disk_name;
 public:
 	const int disk_amount;
@@ -10,6 +11,7 @@ public:
 	Disk(int);
 	void add_disk(char*);
 	char* _get_disk(int) const;
+	char* _get_disk_name(int) const;
 	~Disk();
 };
 

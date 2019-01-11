@@ -148,6 +148,8 @@ end:
 
 void Finder::context_menu(LPARAM lParam)
 {
+	select_item();
+
 	char *temp = new char[200];
 	_init_menu();
 
@@ -214,11 +216,6 @@ void Finder::paste()
 	}
 }
 
-void Finder::resize_objects()
-{
-	resize();
-}
-
 void Finder::show_info()
 {
 	DialogBoxParam(hInst, MAKEINTRESOURCE(ID_DLG_INFO), hWnd, (DLGPROC)DlgInfo, (LPARAM)this);
@@ -229,22 +226,46 @@ void Finder::refresh()
 	update_listview();
 }
 
-void Finder::tree_select()
-{
-	if (!this)
-		return;
-	
-	HTREEITEM item = TreeView_GetNextItem(Tree, NULL, TVGN_CARET);
-	TreeView_Expand(Tree, item, TVE_EXPAND);
-	TVITEMEX tv;
-	tv.mask = TVIF_PARAM;
-	tv.hItem = item;
-	TreeView_GetItem(Tree, &tv);
-
-	update_listview();
-}
-
 void Finder::show_about()
 {
 	DialogBox(hInst, MAKEINTRESOURCE(ID_ABOUT), hWnd, (DLGPROC)DlgAbout);
 }
+
+void Finder::tree_to_list()
+{
+	if (!this)
+		return;
+
+	HTREEITEM _selected = TreeView_GetSelection(Tree); 
+	TreeView_Expand(Tree, _selected, TVE_EXPAND);
+	path.main_path = _get_full_path(_selected);
+
+	update_listview();
+}
+
+void Finder::select_tree(LPARAM lParam)
+{
+	if (!this)
+		return;
+
+	HTREEITEM myComputer = TreeView_GetRoot(Tree);
+	NMHDR* notifyMess = (NMHDR*)lParam;
+	LPNMTREEVIEW _tree = (LPNMTREEVIEW)notifyMess; 
+	HTREEITEM _selected = _tree->itemNew.hItem;
+
+	if (_selected == myComputer) 
+		return;
+
+	HTREEITEM _selected_child = TreeView_GetChild(Tree, _selected); 
+	if (_selected_child) {
+		do {
+			if(!TreeView_GetChild(Tree, _selected_child)) {
+				tree_load(_selected_child, _get_full_path(_selected_child) + "*");
+			}
+		} while (_selected_child = TreeView_GetNextSibling(Tree, _selected_child));
+
+	}
+	else
+		tree_load(_selected, _get_full_path(_selected) + "*");
+}
+

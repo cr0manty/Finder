@@ -7,19 +7,19 @@ class Objects
 	void _create_tree();
 	void _crete_objects();
 	void set_listviw_colum();
+	int buttons_amount;
 protected:
 	HWND ListView;
 	HWND Edit;
 	HWND ComboBox;
 	HWND *Button;
 	HWND Tree;
-	HWND Search;
 	HMENU Menu;
 	HWND hWnd;
 	const int number_colum;
 
 	Objects(HWND, int);
-
-	void resize();
 	~Objects();
+public:
+	void resize() const;
 };

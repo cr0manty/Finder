@@ -28,6 +28,7 @@ namespace local_ru
 	const char * const MenuCreateFile		= "Папку";
 	const char * const MenuCreateTxt		= "Текстовый документ";
 	const char * const MenuInfo				= "Свойства";
+	const char * const MyComputer			= "Мой компьютер";
 	const char * const MenuLink				= "Создать ярлык";
 	const char * const DefaultTextFile		= "Новый текстовый документ";
 	const char * const DefaultFolder		= "Новая папка";
@@ -35,7 +36,7 @@ namespace local_ru
 	const char * const ErrorEmptyName		= "Имя файла не может быть пустым!";
 	const char * const DialogInfoName		= "Свойства";
 	const char * const DialogAboutName		= "О программе";
-	const char * const Copyright			= "Харьковский национальный университет радиоэлектроники\nКурсовая работа по системному программированию\nТема: Реализация проводника для системы Windows\nСдутент группы КИУКИ - 17 - 8\nДудка Денис\n\n\n\t\t\tХарьков 2019";
+	const char * const Copyright			= "Харьковский национальный университет радиоэлектроники\nКурсовая работа по системному программированию\nТема: Реализация проводника для системы Windows\nСтудент группы КИУКИ - 17 - 8\nДудка Денис\n\n\n\t\t\tХарьков 2019";
 
 
 }

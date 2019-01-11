@@ -23,9 +23,9 @@ public:
 	void disk_change(WPARAM);
 	void delete_item();
 	void paste();
-	void resize_objects();
 	void show_info();
 	void refresh();
-	void tree_select();
 	void show_about();
+	void tree_to_list();
+	void select_tree(LPARAM);
 };

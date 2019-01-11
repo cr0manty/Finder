@@ -13,6 +13,6 @@ static LPCTSTR wnd_class = "Finder";
 
 ATOM MyRegisterClass(HINSTANCE);
 BOOL InitInstance(HINSTANCE, int);
-LRESULT __stdcall WndProc(HWND, UINT, WPARAM, LPARAM);
+__int64 __stdcall WndProc(HWND, UINT, WPARAM, LPARAM);
 BOOL __stdcall DlgInfo(HWND, UINT, WPARAM, LPARAM);
 BOOL __stdcall DlgAbout(HWND, UINT, WPARAM, LPARAM);

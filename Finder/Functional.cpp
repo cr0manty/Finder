@@ -1,4 +1,5 @@
 #include "Functional.h"
+#include <shlwapi.h>
 
 void Functional::_init_menu()
 {
@@ -29,38 +30,36 @@ void Functional::_init_menu()
 
 void Functional::_init_tree()
 {
-	TV_INSERTSTRUCT tvInsert;
-	tvInsert.hParent = nullptr;
-	tvInsert.hInsertAfter = TVI_ROOT;
-	tvInsert.item.mask = TVIF_TEXT | TVIF_PARAM;
-	tvInsert.item.pszText = (LPSTR)"Desktop";
-	tvInsert.item.lParam = (LPARAM)("Desktop");
-	HTREEITEM hDesktop = TreeView_InsertItem(Tree, &tvInsert);
+	TV_INSERTSTRUCT _insert;
 
-	tvInsert.hParent = hDesktop;
-	tvInsert.hInsertAfter = TVI_LAST;
-	tvInsert.item.pszText = (LPSTR)"My Computer";
-	tvInsert.item.lParam = (LPARAM)("MyComputer");
-	HTREEITEM hMyComputer = TreeView_InsertItem(Tree, &tvInsert);
+	_insert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
 
-	for (int i = 0; i < disks->disk_amount; i++) {
-		tvInsert.hParent = hMyComputer;
-		tvInsert.item.pszText = disks->_get_disk(i);
-		tvInsert.item.lParam = (LPARAM)disks->_get_disk(i);
-		HTREEITEM hDrive = TreeView_InsertItem(Tree, &tvInsert);
-		TreeView_Expand(Tree, hMyComputer, TVE_EXPAND);
-		TreeView_SelectItem(Tree, hMyComputer);
+	_insert.hParent = NULL;
+	_insert.hInsertAfter = TVI_LAST;
+	_insert.item.pszText = (LPSTR)local_ru::MyComputer;
+	_insert.item.lParam = (LPARAM)local_ru::MyComputer;
+	HTREEITEM MyComputer = TreeView_InsertItem(Tree, &_insert);
+	HTREEITEM Disk;
+
+	for (int i = 0; i < disks->disk_amount; ++i) {
+		_insert.hParent = MyComputer;
+		_insert.item.pszText = disks->_get_disk(i);
+		_insert.item.lParam = (LPARAM)disks->_get_disk(i);
+		Disk = TreeView_InsertItem(Tree, &_insert);
+		tree_load(Disk, _getPath(Disk));
 	}
 
+	TreeView_Expand(Tree, MyComputer, TVE_EXPAND);
+	TreeView_SelectItem(Tree, MyComputer);
 }
 
 void Functional::disk_list()
 {
-	char arr[1024], *b;
+	char arr[512], *b;
+	int amount = GetLogicalDriveStrings(sizeof(arr), arr);
 
-	GetLogicalDriveStrings(sizeof(arr), arr);
 	b = arr;
-	disks = new Disk(strlen(arr) / 3);
+	disks = new Disk(amount / 4);
 
 	while (*b != 0) {
 		SendMessage(ComboBox, CB_ADDSTRING, NULL, (LPARAM)b);
@@ -68,7 +67,6 @@ void Functional::disk_list()
 		b += 4;
 	}
 	SendMessage(ComboBox, CB_SETCURSEL, NULL, (LPARAM)1);
-	
 }
 
 bool Functional::_delete(const std::string &_delete)
@@ -170,12 +168,44 @@ std::string Functional::file_name(const std::string &_path)
 	return _path.substr(_path.rfind('\\') + 1, _path.size() -1);
 }
 
+std::string Functional::_getPath(HTREEITEM _item)
+{
+	char *str = new char[100];
+	TV_ITEM tv;
+
+	tv.mask = TVIF_TEXT | TVIF_HANDLE;
+	tv.hItem = _item;
+	tv.pszText = str;
+	tv.cchTextMax = 100;
+	TreeView_GetItem(Tree, &tv);
+
+	return (char*)tv.pszText;
+}
+
+std::string Functional::_get_full_path(HTREEITEM _selected)
+{
+	std::string temp_path = _getPath(_selected) + "\\", temp;
+
+	HTREEITEM _selected_child = TreeView_GetParent(Tree, _selected);
+	HTREEITEM root = TreeView_GetRoot(Tree);
+
+	while (_selected_child != root && _selected_child) {
+		temp = _getPath(_selected_child);
+		if (temp != "C:\\")
+			temp_path.insert(0, "\\");
+		temp_path.insert(0, temp);
+		_selected_child = TreeView_GetParent(Tree, _selected_child);
+	}
+
+	return temp_path;
+}
+
 Functional::Functional(HWND _hWnd) :
-	path("C:\\", path.main_path), Objects(_hWnd,4)
+	path("C:\\", path.main_path), Objects(_hWnd,3)
 {
 	disk_list();
-	_init_tree();
 	update_listview();
+	_init_tree();
 }
 
 bool Functional::make_paste()
@@ -246,7 +276,6 @@ void Functional::update_listview()
 bool Functional::start_rename(int _index)
 {
 	temp_edit = ListView_EditLabel(ListView, _index);
-	
 	return temp_edit;
 }
 
@@ -264,4 +293,34 @@ bool Functional::end_rename(int)
 Functional::~Functional()
 {
 	delete disks;
+}
+
+void Functional::tree_load(HTREEITEM _item, const std::string &_path)
+{
+	std::string temp = _path + "*";
+	SmartFinder file;
+
+	if (!file.find(temp))
+		return;
+
+	TV_INSERTSTRUCT _insert;
+	_insert.hParent = _item;
+	_insert.hInsertAfter = TVI_SORT;
+	_insert.item.mask = TVIF_TEXT | TVIF_SELECTEDIMAGE | TVIF_PARAM;
+
+	do {
+		std::string folder_path;
+		if (file.is_directory() && file.hidden()) {
+			_insert.item.pszText = file._get().cFileName;
+
+			folder_path = _path;
+			if (_path.size() != 3)
+				folder_path += "\\";
+			folder_path += file._get().cFileName;
+
+			_insert.item.lParam = (LPARAM)folder_path.c_str();
+
+			TreeView_InsertItem(Tree, &_insert);
+		}
+	} while (file.next());
 }

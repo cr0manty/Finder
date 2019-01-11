@@ -17,7 +17,11 @@ protected:
 	void _init_menu();
 	void _init_tree();
 	void disk_list();
+	void tree_load(HTREEITEM, const std::string &);
 	bool _delete(const std::string &);
+	std::string _getPath(HTREEITEM);
+	std::string _get_full_path(HTREEITEM);
+
 	bool _add_lw_item(const std::string *);
 	bool open_proc();
 	bool make_paste();

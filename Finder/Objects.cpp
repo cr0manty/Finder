@@ -1,16 +1,16 @@
 #include "Objects.h"
 
 Objects::Objects(HWND _hWnd, int _size) :
-	hWnd(_hWnd), number_colum(5)
+	hWnd(_hWnd), number_colum(5), buttons_amount(_size)
 {
-	Button = new HWND[_size];
+	Button = new HWND[buttons_amount];
 
 	_create_listview();
 	_create_tree();
 	_crete_objects();
 }
 
-void Objects::resize()
+void Objects::resize() const
 {
 	RECT WindowRT;
 	HWND temp = NULL;
@@ -27,16 +27,13 @@ Objects::~Objects()
 {
 	DestroyMenu(Menu);
 	DestroyWindow(Edit);
-	DestroyWindow(Button[0]);
-	DestroyWindow(Button[1]);
-	DestroyWindow(Button[2]);
-	DestroyWindow(Button[3]);
-
 	DestroyWindow(Tree);
 	DestroyWindow(ListView);
 	DestroyWindow(ComboBox);
 	DestroyWindow(hWnd);
 
+	for (int i = 0; i < buttons_amount; i++)
+		DestroyWindow(Button[i]);
 	delete[] Button;
 }
 
@@ -84,8 +81,6 @@ void Objects::_crete_objects()
 		0, 0, 0, 0, hWnd, (HMENU)ID_PATH_EDIT, hInst, NULL);
 	ComboBox = CreateWindow("combobox", NULL, WS_CHILD | WS_VISIBLE | CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | CB_SHOWDROPDOWN | WS_BORDER,
 		0, 0, 0, 0, hWnd, (HMENU)ID_DISKLIST_CB, NULL, NULL);
-	Search = CreateWindow("edit", NULL, WS_CHILD | WS_VISIBLE | ES_MULTILINE | WS_BORDER,
-		100, 0, 175, 25, hWnd, (HMENU)ID_SEARCH_EDIT, hInst, NULL);
 
 	Button[0] = CreateWindow("button", "<-", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_BORDER,
 		0, 0, 50, 25, hWnd, (HMENU)ID_BACK_BUTTON, hInst, NULL);
@@ -93,8 +88,6 @@ void Objects::_crete_objects()
 		50, 0, 50, 25, hWnd, (HMENU)ID_NEXT_BUTTON, hInst, NULL);
 	Button[2] = CreateWindow("button", "Refresh", WS_VISIBLE | WS_CHILD | BS_BITMAP | WS_BORDER,
 		0, 0, 0, 0, hWnd, (HMENU)ID_REFRESH_BTN, NULL, NULL);
-	Button[3] = CreateWindow("button", "Search", WS_CHILD | WS_VISIBLE | WS_BORDER | BS_BITMAP,
-		275, 0, 25, 25, hWnd, (HMENU)ID_SEARCH_BTN, hInst, NULL);
 	/*HBITMAP hBitmap = (HBITMAP)LoadImage(hInst, MAKEINTRESOURCE(IDB_BITMAP1),
 		IMAGE_BITMAP, 0, 0, 1);
 	SendMessage(Button[2], BM_SETIMAGE, IMAGE_BITMAP, LPARAM(hBitmap));*/

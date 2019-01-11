@@ -1,9 +1,8 @@
 #include "Finder.h"
 
-LRESULT __stdcall WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+__int64 __stdcall WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static Finder *main;
-	LPNMHDR lpnmHdr;
 
 	switch (message)
 	{
@@ -12,12 +11,11 @@ LRESULT __stdcall WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_SIZE:
-		main->resize_objects();
+		main->resize();
 		break;
 
 	case WM_NOTIFY:
-		lpnmHdr = (LPNMHDR)lParam;
-		switch (lpnmHdr->code)
+		switch (LPNMHDR(lParam)->code)
 		{
 		case NM_DBLCLK:
 			main->open();
@@ -28,13 +26,16 @@ LRESULT __stdcall WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 
 		case TVN_SELCHANGED:
-			main->tree_select();
+			main->tree_to_list();
+			break;
+
+		case TVN_ITEMEXPANDING: 
+			main->select_tree(lParam);
 			break;
 		}
 		break;
 
 	case WM_CONTEXTMENU:
-		main->select_item();
 		main->context_menu(lParam);
 		break;
 
