@@ -4,15 +4,20 @@
 #include <string>
 #include <commctrl.h>
 #include "resource.h"
-#include "Local.h"
+#include "Objects.h"
+#include "Additional.h"
+#include "SmartFinder.h"
+#include "SmartStringLoad.h"
 
 #pragma comment(lib, "ComCtl32.Lib")
+#define Copy false
+#define Paste true
 
 static HINSTANCE hInst;
-static LPCTSTR wnd_class = "Finder";
+static const char* wnd_class = "Finder";
 
-ATOM MyRegisterClass(HINSTANCE);
-BOOL InitInstance(HINSTANCE, int);
+unsigned short MyRegisterClass(HINSTANCE);
+bool InitInstance(HINSTANCE, int);
 __int64 __stdcall WndProc(HWND, UINT, WPARAM, LPARAM);
-BOOL __stdcall DlgInfo(HWND, UINT, WPARAM, LPARAM);
-BOOL __stdcall DlgAbout(HWND, UINT, WPARAM, LPARAM);
+bool __stdcall DlgInfo(HWND, UINT, WPARAM, LPARAM);
+bool __stdcall DlgAbout(HWND, UINT, WPARAM, LPARAM);

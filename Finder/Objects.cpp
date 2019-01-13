@@ -1,4 +1,10 @@
-#include "Objects.h"
+#include "includes.h"
+
+bool Objects::mouse_cmenu(const POINT &_p)
+{
+	return _p.x < LVrt.right && _p.x > LVrt.left &&
+		_p.y < LVrt.bottom && _p.y > LVrt.top;
+}
 
 Objects::Objects(HWND _hWnd, int _size) :
 	hWnd(_hWnd), number_colum(5), buttons_amount(_size)
@@ -8,15 +14,20 @@ Objects::Objects(HWND _hWnd, int _size) :
 	_create_listview();
 	_create_tree();
 	_crete_objects();
+	_create_hotkey();
+	resize();
 }
 
-void Objects::resize() const
+void Objects::resize()
 {
-	RECT WindowRT;
+	if (!this)
+		return;
 	HWND temp = NULL;
 
 	GetClientRect(hWnd, &WindowRT);
-	SetWindowPos(ListView, temp, WindowRT.left + 300, WindowRT.top + 25, WindowRT.right - 300, WindowRT.bottom, NULL);
+	LVrt = { WindowRT.left + 300, WindowRT.top + 25, WindowRT.right, WindowRT.bottom };
+
+	SetWindowPos(ListView, temp, LVrt.left, LVrt.top, LVrt.right, LVrt.bottom, NULL);
 	SetWindowPos(Tree, temp, WindowRT.left, WindowRT.top + 25, WindowRT.left + 300, WindowRT.bottom, NULL);
 	SetWindowPos(Edit, temp, WindowRT.left + 300, WindowRT.top, WindowRT.right - 380, 25, NULL);
 	SetWindowPos(Button[2], temp, WindowRT.right - 80, WindowRT.top, 25, 25, NULL);
@@ -25,7 +36,9 @@ void Objects::resize() const
 
 Objects::~Objects()
 {
-	DestroyMenu(Menu);
+	DestroyMenu(CMenu);
+	DestroyMenu(Main_Menu);
+
 	DestroyWindow(Edit);
 	DestroyWindow(Tree);
 	DestroyWindow(ListView);
@@ -53,7 +66,7 @@ void Objects::_create_listview()
 
 	ListView_SetExtendedListViewStyleEx(ListView, 0, LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 
-	set_listviw_colum();
+	_set_listviw_colum();
 	ShowWindow(ListView, SW_SHOWDEFAULT);
 }
 
@@ -93,8 +106,23 @@ void Objects::_crete_objects()
 	SendMessage(Button[2], BM_SETIMAGE, IMAGE_BITMAP, LPARAM(hBitmap));*/
 }
 
-void Objects::set_listviw_colum()
+void Objects::_create_hotkey()
 {
+	RegisterHotKey(hWnd, ID_DELETE_HK, NULL, VK_DELETE);
+	RegisterHotKey(hWnd, ID_COPY_HK, MOD_CONTROL, 0x43);
+	RegisterHotKey(hWnd, ID_CUT_HK, MOD_CONTROL, 0x58);
+	RegisterHotKey(hWnd, ID_PASTE_HK, MOD_CONTROL, 0x56);
+	RegisterHotKey(hWnd, ID_REFRESH_HK, MOD_CONTROL, 0x52);
+	RegisterHotKey(hWnd, ID_MINIM_HK, MOD_CONTROL, 0x57);
+	RegisterHotKey(hWnd, ID_BACK_HK, MOD_ALT, VK_LEFT);
+	RegisterHotKey(hWnd, ID_NEXT_HK, MOD_ALT, VK_RIGHT);
+
+}
+
+void Objects::_set_listviw_colum()
+{
+	std::string header[5] = { (char*)"Имя", (char*)"Дата изменения", (char*)"Тип", (char*)"Размер" , (char*)"Дата создания" };
+
 	RECT rcl;
 	GetClientRect(ListView, &rcl);
 	int index = -1;
@@ -106,7 +134,7 @@ void Objects::set_listviw_colum()
 
 	for (int i = 0; i < number_colum; i++)
 	{
-		lvc.pszText = (LPSTR)local_ru::header[i].c_str();
+		lvc.pszText = (LPSTR)header[i].c_str();
 		index = ListView_InsertColumn(ListView, i, &lvc);
 		if (index == -1) break;
 	}

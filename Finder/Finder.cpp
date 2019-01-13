@@ -1,8 +1,9 @@
 #include "Finder.h"
 #include <fstream>
+#include <ShlObj.h>
 
 Finder::Finder(HWND _hWnd) :
-	Functional(_hWnd)
+	Functional(_hWnd), current_lang(Menu_change_lang_ru)
 {
 }
 
@@ -13,16 +14,14 @@ Path Finder::_get_path() const
 
 void Finder::create_txt()
 {
-	int i = 1;
-	std::string additional = ".txt";
 	SmartFinder find;
-	while (find.find(path.main_path + local_ru::DefaultTextFile + additional))
-			additional = " (" + std::to_string(i++) + ").txt";
-	additional = path.main_path + local_ru::DefaultTextFile + additional;
+	SmartStringLoad str(DefaultTextFile);
+
 	try {
-		std::ofstream file(additional);
+		std::ofstream file(same_name(path.main_path + str._get_1() + ".txt"));
 		file.close();
 	}
+
 	catch (...) {
 		return;
 	}
@@ -32,16 +31,11 @@ void Finder::create_txt()
 
 void Finder::create_folder()
 {
-	int i = 1;
-	std::string additional;
 	SmartFinder file;
-
-	while (file.find(path.main_path + local_ru::DefaultFolder + additional))
-			additional = " (" + std::to_string(i++) + ")";
-	additional = path.main_path + local_ru::DefaultFolder + additional;
+	SmartStringLoad str(DefaultFolder);
 
 	try {
-		boost::filesystem::create_directory(additional);
+		boost::filesystem::create_directory(same_name(path.main_path + str._get_1()));
 	}
 	catch (...) {
 		return;
@@ -108,7 +102,7 @@ void Finder::create_link()
 	}
 }
 
-void Finder::back_button()
+void Finder::show_back()
 {
 	if (path.main_path.size() <= 4)
 		return;
@@ -121,7 +115,7 @@ void Finder::back_button()
 	update_listview();
 }
 
-void Finder::next_button()
+void Finder::show_next()
 {
 	if (path.next_path != path.main_path) {
 		path.main_path = path.next_path;
@@ -137,7 +131,7 @@ void Finder::select_item()
 		-1, LVNI_ALL | LVNI_SELECTED);
 	ListView_GetItemText(ListView, index, 0, temp, 200);
 
-	if (!temp)
+	if (index == -1)
 		goto end;
 
 	path.selected_index = index;
@@ -149,15 +143,21 @@ end:
 void Finder::context_menu(LPARAM lParam)
 {
 	select_item();
+	POINT point;
+	GetCursorPos(&point);
+	ScreenToClient(hWnd, &point);
+
+	if (!mouse_cmenu(point))
+		return;
 
 	char *temp = new char[200];
-	_init_menu();
-
-	TrackPopupMenu(Menu, TPM_RIGHTBUTTON |
+	_init_cmenu();
+	RECT rt;
+	GetClientRect(ListView, &rt);
+	TrackPopupMenu(CMenu, TPM_RIGHTBUTTON |
 		TPM_TOPALIGN |
 		TPM_LEFTALIGN,
-		LOWORD(lParam),
-		HIWORD(lParam), 0, hWnd, NULL);
+		LOWORD(lParam), HIWORD(lParam), 0, hWnd, &LVrt);
 
 	int index = ListView_GetNextItem(ListView,
 		-1, LVNI_ALL | LVNI_SELECTED);
@@ -166,7 +166,7 @@ void Finder::context_menu(LPARAM lParam)
 	path.selected_file = path.main_path + temp;
 	delete[] temp;
 
-	DestroyMenu(Menu);
+	DestroyMenu(CMenu);
 }
 
 void Finder::file_manip(bool _cut)
@@ -200,17 +200,18 @@ void Finder::delete_item()
 {
 	if (!path)
 		return;
+	SmartStringLoad str(DeleteFileInfo, DeleteFileHeader, 64);
 
-	if (MessageBox(NULL, local_ru::DeleteFileInfo,
-		local_ru::DeleteFileHeader, MB_ICONQUESTION | MB_YESNO) == IDYES) {
+	if (MessageBox(NULL, str._get_1(),
+		str._get_2(), MB_ICONQUESTION | MB_YESNO) == IDYES) {
 		_delete(path.selected_file);
 		update_listview();
 	}
 }
 
-void Finder::paste()
+void Finder::make_paste()
 {
-	if (make_paste()) {
+	if (try_paste()) {
 		update_listview();
 		manip.clear();
 	}
@@ -221,7 +222,7 @@ void Finder::show_info()
 	DialogBoxParam(hInst, MAKEINTRESOURCE(ID_DLG_INFO), hWnd, (DLGPROC)DlgInfo, (LPARAM)this);
 }
 
-void Finder::refresh()
+void Finder::make_refresh()
 {
 	update_listview();
 }
@@ -235,15 +236,25 @@ void Finder::tree_to_list()
 {
 	if (!this)
 		return;
-
+	
 	HTREEITEM _selected = TreeView_GetSelection(Tree); 
 	TreeView_Expand(Tree, _selected, TVE_EXPAND);
-	path.main_path = _get_full_path(_selected);
 
-	update_listview();
+	std::string temp = _get_full_path(_selected);
+	SmartFinder file(temp);
+	path.selected_file = temp;
+	
+	if (!file.is_file()) {
+		if (!TreeView_GetChild(Tree, _selected))
+			temp += '\\';
+		path.main_path = temp;
+		update_listview();
+	}
+	else
+		open_proc();
 }
 
-void Finder::select_tree(LPARAM lParam)
+void Finder::tree_show(LPARAM lParam)
 {
 	if (!this)
 		return;
@@ -260,12 +271,26 @@ void Finder::select_tree(LPARAM lParam)
 	if (_selected_child) {
 		do {
 			if(!TreeView_GetChild(Tree, _selected_child)) {
-				tree_load(_selected_child, _get_full_path(_selected_child) + "*");
+				tree_load(_selected_child, _get_full_path(_selected_child) + "\\*");
 			}
 		} while (_selected_child = TreeView_GetNextSibling(Tree, _selected_child));
 
 	}
-	else
-		tree_load(_selected, _get_full_path(_selected) + "*");
 }
 
+void Finder::minimize_window()
+{
+	ShowWindowAsync(hWnd, SW_MINIMIZE);
+}
+
+void Finder::exit()
+{
+	PostQuitMessage(0);
+}
+
+void Finder::change_lang(int _lang)
+{
+	EnableMenuItem(Main_Menu, current_lang, MF_ENABLED);
+	current_lang = _lang;
+	EnableMenuItem(Main_Menu, _lang, MF_DISABLED);
+}

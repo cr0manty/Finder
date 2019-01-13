@@ -25,6 +25,7 @@
 #define ID_MAIN_MENU                    114
 #define IDD_DIALOG1                     115
 #define ID_ABOUT                        115
+#define IDR_MENU1                       118
 #define IDC_EDIT1                       1006
 #define IDC_EDIT2                       1006
 #define ID_DLG_INFO                     1007
@@ -41,15 +42,65 @@
 #define IDC_STATIC_STATIC4              1017
 #define IDC_STATIC_STATIC5              1018
 #define IDC_STATIC_STATIC6              1019
+#define PathInfo                        11000
+#define window_name                     11001
+#define DeleteFileInfo                  11002
+#define DeleteFileHeader                11003
+#define Folder_info                     11004
+#define Create_item                     11005
+#define Delete_item                     11006
+#define Copy_item                       11007
+#define Paste_item                      11008
+#define Cut_item                        11009
+#define ErrorCNewFile                   11010
+#define ErrorCNewDir                    11011
+#define Error_info                      11012
+#define ErrorDelete                     11013
+#define ErrorPaste                      11014
+#define MenuOpen                        11015
+#define MenuCut                         11016
+#define MenuCopy                        11017
+#define MenuDelete                      11018
+#define MenuPaste                       11019
+#define MenuRename                      11020
+#define MenuCreate                      11021
+#define MenuCreateFile                  11022
+#define MenuCreateTxt                   11023
+#define MenuInfo                        11024
+#define MyComputer_info                 11025
+#define MenuLink                        11026
+#define DefaultTextFile                 11027
+#define DefaultFolder                   11028
+#define FileLink                        11029
+#define ErrorEmptyName                  11030
+#define DialogInfoName                  11031
+#define DialogAboutName                 11032
+#define Copyright                       11033
+#define Menu_file                       11034
+#define Menu_file_exit                  11035
+#define Menu_change_lang_ru             11036
+#define Menu_change_lang_en             11037
+#define Menu_change_lang_ua		        11038
+#define Menu_change_language            11039
 #define ID_PROGRAM_ABOUT                40004
 #define ID_PROGRAM_CLOSE                40005
+#define ID_LANGUAGE                     40006
+#define ID_DELETE_HK                    40007
+#define ID_COPY_HK                      40008
+#define ID_CUT_HK                       40009
+#define ID_PASTE_HK                     40010
+#define ID_REFRESH_HK                   40011
+#define ID_MINIM_HK                     40012
+#define ID_BACK_HK                      40013
+#define ID_NEXT_HK                      40014
+#define Menu_exit                       40015
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        117
-#define _APS_NEXT_COMMAND_VALUE         40006
+#define _APS_NEXT_RESOURCE_VALUE        120
+#define _APS_NEXT_COMMAND_VALUE         40012
 #define _APS_NEXT_CONTROL_VALUE         1020
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

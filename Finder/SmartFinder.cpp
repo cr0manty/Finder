@@ -1,4 +1,4 @@
-#include "SmartFinder.h"
+#include "includes.h"
 
 SmartFinder::SmartFinder() :
 	Find(NULL)
@@ -14,7 +14,6 @@ SmartFinder::SmartFinder(const std::string &_path) :
 bool SmartFinder::find(const std::string &_name)
 {
 	Find = FindFirstFile(_name.c_str(), &file);
-
 	return Find != INVALID_HANDLE_VALUE;
 }
 
@@ -40,14 +39,13 @@ bool SmartFinder::hidden() const
 		lstrcmp(file.cFileName, "..") && lstrcmp(file.cFileName, ".");
 }
 
-
 WIN32_FIND_DATA SmartFinder::_get() const
 {
 	return file;
 }
 
-
 SmartFinder::~SmartFinder()
 {
-	FindClose(Find);
+	if(Find)
+		FindClose(Find);
 }

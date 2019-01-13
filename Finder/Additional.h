@@ -1,5 +1,5 @@
 #pragma once
-#include "Objects.h"
+#include <string>
 
 class Disk 
 {

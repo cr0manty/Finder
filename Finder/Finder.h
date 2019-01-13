@@ -1,9 +1,10 @@
 #pragma once
 #include "Functional.h"
-#include <ShlObj.h>
+
 
 class Finder : public Functional
 {
+	int current_lang;
 public:
 	Finder(HWND);
 	Path _get_path() const;
@@ -14,18 +15,21 @@ public:
 
 	void open();
 	void create_link();
-	void back_button();
-	void next_button();
+	void show_back();
+	void show_next();
 	void select_item();
 	void context_menu(LPARAM);
 	void file_manip(bool);
 	void fix_size(LPARAM);
 	void disk_change(WPARAM);
 	void delete_item();
-	void paste();
+	void make_paste();
 	void show_info();
-	void refresh();
+	void make_refresh();
 	void show_about();
 	void tree_to_list();
-	void select_tree(LPARAM);
+	void tree_show(LPARAM);
+	void minimize_window();
+	void exit();
+	void change_lang(int);
 };

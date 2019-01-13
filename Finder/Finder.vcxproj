@@ -127,9 +127,10 @@
     <ClCompile Include="Additional.cpp" />
     <ClCompile Include="Finder.cpp" />
     <ClCompile Include="Functional.cpp" />
-    <ClCompile Include="MsgWork.cpp" />
+    <ClCompile Include="MainFunc.cpp" />
     <ClCompile Include="Objects.cpp" />
     <ClCompile Include="SmartFinder.cpp" />
+    <ClCompile Include="SmartStringLoad.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -137,10 +138,10 @@
     <ClInclude Include="Finder.h" />
     <ClInclude Include="Functional.h" />
     <ClInclude Include="includes.h" />
-    <ClInclude Include="Local.h" />
     <ClInclude Include="Objects.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SmartFinder.h" />
+    <ClInclude Include="SmartStringLoad.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Finder.rc" />

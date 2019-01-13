@@ -1,12 +1,13 @@
 #pragma once
-#include "includes.h"
 
 class Objects
 {
 	void _create_listview();
 	void _create_tree();
 	void _crete_objects();
-	void set_listviw_colum();
+	void _set_listviw_colum();
+	void _create_hotkey();
+
 	int buttons_amount;
 protected:
 	HWND ListView;
@@ -14,12 +15,16 @@ protected:
 	HWND ComboBox;
 	HWND *Button;
 	HWND Tree;
-	HMENU Menu;
+	HMENU CMenu;
+	HMENU Main_Menu;
 	HWND hWnd;
 	const int number_colum;
+	RECT LVrt;
+	RECT WindowRT;
+	bool mouse_cmenu(const POINT &);
 
 	Objects(HWND, int);
 	~Objects();
 public:
-	void resize() const;
+	void resize();
 };

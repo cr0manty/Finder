@@ -1,5 +1,4 @@
 #pragma once
-#include "Additional.h"
 
 class SmartFinder
 {

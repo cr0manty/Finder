@@ -1,6 +1,6 @@
 #include "Finder.h"
 
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
+int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmdLine,
 	int nCmdShow)
 {
 	MSG msg;
@@ -10,8 +10,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		return FALSE;
 
 	while (GetMessage(&msg, NULL, 0, 0)) {
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
 	}
 
 	return msg.wParam;
