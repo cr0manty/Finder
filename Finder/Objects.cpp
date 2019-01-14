@@ -10,7 +10,6 @@ Objects::Objects(HWND _hWnd, int _size) :
 	hWnd(_hWnd), number_colum(5), buttons_amount(_size)
 {
 	Button = new HWND[buttons_amount];
-
 	_create_listview();
 	_create_tree();
 	_crete_objects();
@@ -29,8 +28,7 @@ void Objects::resize()
 
 	SetWindowPos(ListView, temp, LVrt.left, LVrt.top, LVrt.right, LVrt.bottom, NULL);
 	SetWindowPos(Tree, temp, WindowRT.left, WindowRT.top + 25, WindowRT.left + 300, WindowRT.bottom, NULL);
-	SetWindowPos(Edit, temp, WindowRT.left + 300, WindowRT.top, WindowRT.right - 380, 25, NULL);
-	SetWindowPos(Button[2], temp, WindowRT.right - 80, WindowRT.top, 25, 25, NULL);
+	SetWindowPos(Edit, temp, WindowRT.left + 300, WindowRT.top, WindowRT.right - 355, 25, NULL);
 	SetWindowPos(ComboBox, temp, WindowRT.right - 55, WindowRT.top, 55, 200, NULL);
 }
 
@@ -60,12 +58,11 @@ void Objects::_create_listview()
 	GetClientRect(hWnd, &WindowRT);
 
 	ListView = CreateWindow(WC_LISTVIEW, NULL,
-		WS_VISIBLE | WS_CHILD | WS_BORDER | LVS_REPORT | LVS_EDITLABELS,
+		WS_VISIBLE | WS_CHILD | WS_BORDER | LVS_REPORT | LVS_EDITLABELS | LVS_SINGLESEL,
 		WindowRT.left + 300, WindowRT.top + 110, WindowRT.right - 290, WindowRT.bottom - 120,
 		hWnd, (HMENU)ID_LISTVIEW, GetModuleHandle(NULL), NULL);
 
 	ListView_SetExtendedListViewStyleEx(ListView, 0, LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
-
 	_set_listviw_colum();
 	ShowWindow(ListView, SW_SHOWDEFAULT);
 }
@@ -99,43 +96,40 @@ void Objects::_crete_objects()
 		0, 0, 50, 25, hWnd, (HMENU)ID_BACK_BUTTON, hInst, NULL);
 	Button[1] = CreateWindow("button", "->", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_BORDER,
 		50, 0, 50, 25, hWnd, (HMENU)ID_NEXT_BUTTON, hInst, NULL);
-	Button[2] = CreateWindow("button", "Refresh", WS_VISIBLE | WS_CHILD | BS_BITMAP | WS_BORDER,
-		0, 0, 0, 0, hWnd, (HMENU)ID_REFRESH_BTN, NULL, NULL);
-	/*HBITMAP hBitmap = (HBITMAP)LoadImage(hInst, MAKEINTRESOURCE(IDB_BITMAP1),
-		IMAGE_BITMAP, 0, 0, 1);
-	SendMessage(Button[2], BM_SETIMAGE, IMAGE_BITMAP, LPARAM(hBitmap));*/
 }
 
 void Objects::_create_hotkey()
 {
 	RegisterHotKey(hWnd, ID_DELETE_HK, NULL, VK_DELETE);
+	RegisterHotKey(hWnd, ID_REFRESH_HK, NULL, VK_F5);
+
 	RegisterHotKey(hWnd, ID_COPY_HK, MOD_CONTROL, 0x43);
 	RegisterHotKey(hWnd, ID_CUT_HK, MOD_CONTROL, 0x58);
 	RegisterHotKey(hWnd, ID_PASTE_HK, MOD_CONTROL, 0x56);
 	RegisterHotKey(hWnd, ID_REFRESH_HK, MOD_CONTROL, 0x52);
 	RegisterHotKey(hWnd, ID_MINIM_HK, MOD_CONTROL, 0x57);
+
 	RegisterHotKey(hWnd, ID_BACK_HK, MOD_ALT, VK_LEFT);
 	RegisterHotKey(hWnd, ID_NEXT_HK, MOD_ALT, VK_RIGHT);
-
 }
 
 void Objects::_set_listviw_colum()
 {
 	std::string header[5] = { (char*)"Имя", (char*)"Дата изменения", (char*)"Тип", (char*)"Размер" , (char*)"Дата создания" };
 
-	RECT rcl;
-	GetClientRect(ListView, &rcl);
+	RECT rt;
+	GetClientRect(ListView, &rt);
 	int index = -1;
 
-	LVCOLUMN lvc;
-	lvc.mask = LVCF_TEXT | LVCF_WIDTH;
-	lvc.cx = (rcl.right - rcl.left) / number_colum;
-	lvc.cchTextMax = 1000;
+	LVCOLUMN lv;
+	lv.mask = LVCF_TEXT | LVCF_WIDTH;
+	lv.cx = (rt.right - rt.left) / number_colum; 
+	lv.cchTextMax = 1000;
 
 	for (int i = 0; i < number_colum; i++)
 	{
-		lvc.pszText = (LPSTR)header[i].c_str();
-		index = ListView_InsertColumn(ListView, i, &lvc);
+		lv.pszText = (LPSTR)header[i].c_str();
+		index = ListView_InsertColumn(ListView, i, &lv);
 		if (index == -1) break;
 	}
 }

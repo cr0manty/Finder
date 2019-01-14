@@ -17,7 +17,7 @@ static HINSTANCE hInst;
 static const char* wnd_class = "Finder";
 
 unsigned short MyRegisterClass(HINSTANCE);
-bool InitInstance(HINSTANCE, int);
+BOOL InitInstance(HINSTANCE, int);
 __int64 __stdcall WndProc(HWND, UINT, WPARAM, LPARAM);
 bool __stdcall DlgInfo(HWND, UINT, WPARAM, LPARAM);
 bool __stdcall DlgAbout(HWND, UINT, WPARAM, LPARAM);

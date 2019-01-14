@@ -4,10 +4,12 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmdL
 	int nCmdShow)
 {
 	MSG msg;
-	MyRegisterClass(hInstance);
 
+	MyRegisterClass(hInstance);
+	
 	if (!InitInstance(hInstance, nCmdShow))
 		return FALSE;
+	
 
 	while (GetMessage(&msg, NULL, 0, 0)) {
 			TranslateMessage(&msg);

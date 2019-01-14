@@ -1,6 +1,24 @@
 #include "Functional.h"
 #include <shlwapi.h>
 
+void Functional::_init_main_menu()
+{
+	Main_Menu = CreateMenu();
+	HMENU Menu = CreatePopupMenu();
+	HMENU File_add = CreatePopupMenu();
+
+	SmartStringLoad str;
+	AppendMenu(Main_Menu, MFT_STRING | MF_POPUP, (UINT)File_add, str._set_and_get(Menu_file));
+	{
+		AppendMenu(File_add, MFT_STRING, ID_PROGRAM_CLOSE, str._set_and_get(Menu_file_exit));
+	}
+	AppendMenu(Main_Menu, MFT_STRING | MF_POPUP, (UINT)Menu, str._set_and_get(DialogAboutName));
+	{
+		AppendMenu(Menu, MFT_STRING | MF_POPUP, ID_PROGRAM_ABOUT, str._set_and_get(DialogAboutName));
+	}
+	SetMenu(hWnd, Main_Menu);
+}
+
 void Functional::_init_cmenu()
 {
 	UINT enabled = (manip) ? MF_ENABLED : MF_DISABLED;
@@ -39,7 +57,7 @@ void Functional::_init_tree()
 	_insert.hParent = NULL;
 	_insert.hInsertAfter = TVI_LAST;
 
-	_insert.item.pszText = (char*)str._get_1();
+	_insert.item.pszText = (char*)str._get();
 
 	HTREEITEM MyComputer = TreeView_InsertItem(Tree, &_insert);
 	HTREEITEM Disk;
@@ -84,8 +102,10 @@ bool Functional::_delete(const std::string &_delete)
 			
 		}
 		catch (boost::filesystem::filesystem_error &_error) {
-			SmartStringLoad str(ErrorDelete, Error_info, 64);
-			MessageBox(NULL, str._get_1(), str._get_2(), MB_OK);
+			SmartStringLoad str(ErrorDelete, 64);
+			SmartStringLoad str_1(Error_info);
+
+			MessageBox(NULL, str._get(), str_1._get(), MB_OK);
 			return false;
 		}
 	}
@@ -161,7 +181,7 @@ std::string * Functional::make_file_info(const WIN32_FIND_DATA &file) const
 	else {
 		SmartStringLoad str(Folder_info);
 
-		_info[2] = str._get_1();
+		_info[2] = str._get();
 		_info[3] = " ";
 	}
 
@@ -227,14 +247,13 @@ std::string Functional::same_name(const std::string &_name)
 			temp = _name;
 			temp += " (" + std::to_string(i++) + ")";
 		}
-
 	}
 
 	return temp;
 }
 
 Functional::Functional(HWND _hWnd) :
-	path("C:\\", path.main_path), Objects(_hWnd,3)
+	path("C:\\", path.main_path), Objects(_hWnd,2)
 {
 	disk_list();
 	update_listview();
@@ -260,9 +279,10 @@ bool Functional::try_paste()
 			boost::filesystem::copy_directory(manip.file, path.main_path + temp.substr(temp.rfind('\\', temp.size() - 1)));
 	}
 	catch (...) {
-		SmartStringLoad str(ErrorPaste, Error_info);
+		SmartStringLoad str(ErrorPaste);
+		SmartStringLoad str_1(Error_info);
 
-		MessageBox(NULL, str._get_1(), str._get_2(), MB_OK);
+		MessageBox(NULL, str._get(), str_1._get(), MB_OK);
 		return false;
 	}
 
@@ -281,9 +301,8 @@ void Functional::update_listview()
 
 	SetWindowText(Edit, path.main_path.c_str());
 	ListView_DeleteAllItems(ListView);
-	buffer = path.main_path + "*";
 
-	if (file.find(buffer)) {
+	if (file.find(path.main_path + "*")) {
 		do {
 			if (file.hidden()) {
 				_add_lw_item(make_file_info(file._get()));
@@ -294,24 +313,6 @@ void Functional::update_listview()
 	item_count = ListView_GetItemCount(ListView);
 }
 
-bool Functional::start_rename(int _index)
-{
-	temp_edit = ListView_EditLabel(ListView, _index);
-	return temp_edit;
-}
-
-bool Functional::end_rename(int)
-{
-	if (!temp_edit) {
-		SmartStringLoad str(ErrorEmptyName, Error_info);
-		MessageBox(NULL, str._get_1(), str._get_2(), MB_OK);
-		return false;
-	}
-	char *temp = new char[200];
-
-	delete[] temp;
-}
-
 Functional::~Functional()
 {
 	delete disks;
@@ -319,10 +320,9 @@ Functional::~Functional()
 
 void Functional::tree_load(HTREEITEM _item, const std::string &_path)
 {
-	std::string temp = _path + "*";
 	SmartFinder file;
 
-	if (!file.find(temp))
+	if (!file.find(_path + "*"))
 		return;
 
 	TV_INSERTSTRUCT _insert;
@@ -335,31 +335,4 @@ void Functional::tree_load(HTREEITEM _item, const std::string &_path)
 			TreeView_InsertItem(Tree, &_insert);
 		}
 	} while (file.next());
-}
-
-void Functional::_init_main_menu()
-{
-	Main_Menu = CreateMenu();
-	HMENU Menu = CreatePopupMenu();
-	HMENU About_add = CreatePopupMenu();
-	HMENU File_add = CreatePopupMenu();
-
-
-	SmartStringLoad str;
-	AppendMenu(Main_Menu, MFT_STRING | MF_POPUP, (UINT)File_add, str._set_and_get(Menu_file));
-	{
-		AppendMenu(File_add, MFT_STRING, ID_PROGRAM_CLOSE, str._set_and_get(Menu_file_exit));
-	}
-	AppendMenu(Main_Menu, MFT_STRING | MF_POPUP, (UINT)Menu, str._set_and_get(DialogAboutName));
-	{
-		AppendMenu(Menu, MFT_STRING | MF_POPUP, (UINT)About_add, str._set_and_get(Menu_change_language));
-		{
-			AppendMenu(About_add, MFT_STRING | MF_DISABLED, Menu_change_lang_ru, "Русский");
-			AppendMenu(About_add, MFT_STRING, Menu_change_lang_en, "English");
-			AppendMenu(About_add, MFT_STRING, Menu_change_lang_ua, "Українська");
-
-		}
-		AppendMenu(Menu, MFT_STRING | MF_POPUP, ID_PROGRAM_ABOUT, str._set_and_get(DialogAboutName));
-	}
-	SetMenu(hWnd, Main_Menu);
 }

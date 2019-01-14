@@ -4,14 +4,14 @@
 
 class Finder : public Functional
 {
-	int current_lang;
 public:
 	Finder(HWND);
 	Path _get_path() const;
 
 	void create_txt();
 	void create_folder();
-	void rename();
+	void start_rename();
+	void end_rename();
 
 	void open();
 	void create_link();
@@ -31,5 +31,4 @@ public:
 	void tree_show(LPARAM);
 	void minimize_window();
 	void exit();
-	void change_lang(int);
 };

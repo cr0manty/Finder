@@ -9,11 +9,7 @@ __int64 __stdcall WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE:
 		main = new Finder(hWnd);
 		break;
-
-	case WM_SIZE:
-		main->resize();
-		break;
-
+	
 	case WM_NOTIFY:
 		switch (LPNMHDR(lParam)->code)
 		{
@@ -23,6 +19,10 @@ __int64 __stdcall WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		case NM_CLICK:
 			main->select_item();
+			break;
+
+		case LVN_ENDLABELEDIT:
+			main->end_rename();
 			break;
 
 		case TVN_SELCHANGED:
@@ -67,7 +67,7 @@ __int64 __stdcall WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 
 		case ID_RENAME_ITEM:
-			main->rename();
+			main->start_rename();
 			break;
 
 		case ID_CREATE_FOLDER:
@@ -104,18 +104,6 @@ __int64 __stdcall WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		case ID_PROGRAM_CLOSE:
 			main->exit();
-			break;
-
-		case Menu_change_lang_ru:
-			main->change_lang(Menu_change_lang_ru);
-			break;
-
-		case Menu_change_lang_en:
-			main->change_lang(Menu_change_lang_en);
-			break;
-
-		case Menu_change_lang_ua:
-			main->change_lang(Menu_change_lang_ua);
 			break;
 		}
 		break;
@@ -161,6 +149,10 @@ __int64 __stdcall WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		main->fix_size(lParam);
 		break;
 
+	case WM_SIZE:
+		main->resize();
+		break;
+
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
@@ -175,24 +167,21 @@ bool __stdcall DlgInfo(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 	HWND Object[6];
 	HWND Object_info[6];
 
-	WIN32_FIND_DATA file;
+	SmartFinder file;
 	std::string *temp;
 	Finder *main;
 	HANDLE hFind;
 	std::string header[5] = { (char*)"Имя", (char*)"Дата изменения", (char*)"Тип", (char*)"Размер" , (char*)"Дата создания" };
-	char *temp_local;
+	SmartStringLoad str;
 
 	switch (msg)
 	{
 	case WM_INITDIALOG:
-		temp_local = new char[32];
-		LoadString(hInst, DialogAboutName, temp_local, 32);
-		SetWindowText(hDlg, temp_local);
-		delete[] temp_local;
+		SetWindowText(hDlg, str._set_and_get(DialogAboutName));
 
 		main = (Finder*)lParam;
-		if (hFind = FindFirstFile(main->_get_path().selected_file.c_str(), &file))
-			temp = main->make_file_info(file);
+		if (file.find(main->_get_path().selected_file))
+			temp = main->make_file_info(file._get());
 		else return FALSE;
 
 		Object[0] = GetDlgItem(hDlg, IDC_STATIC1);
@@ -210,17 +199,14 @@ bool __stdcall DlgInfo(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 		Object_info[1] = GetDlgItem(hDlg, IDC_STATIC_STATIC6);
 
 
-		for (int i = 0; i < 5; i++) {
-			SendMessage(Object[i], WM_SETTEXT, (WPARAM)255, (LPARAM)temp[i].c_str());
-			SendMessage(Object_info[i], WM_SETTEXT, (WPARAM)255, (LPARAM)header[i].c_str());
+		for (int i = Table_name, j = 0; i <= Table_date_create; i++, j++) {
+			SendMessage(Object[j], WM_SETTEXT, (WPARAM)255, (LPARAM)temp[j].c_str());
+			SendMessage(Object_info[j], WM_SETTEXT, (WPARAM)255, (LPARAM)str._set_and_get(i));
 		}
-		temp_local = new char[32];
-		LoadString(hInst, PathInfo, temp_local, 32);
 
 		SendMessage(Object[5], WM_SETTEXT, (WPARAM)255, (LPARAM)main->_get_path().main_path.c_str());
-		SendMessage(Object_info[5], WM_SETTEXT, (WPARAM)255, (LPARAM)temp_local);
-		delete[] temp_local;
-
+		SendMessage(Object_info[5], WM_SETTEXT, (WPARAM)255, (LPARAM)str._set_and_get(PathInfo));
+		delete[] temp;
 		return TRUE;
 
 	case WM_COMMAND:
@@ -228,7 +214,6 @@ bool __stdcall DlgInfo(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 			EndDialog(hDlg, LOWORD(wParam));
 			return TRUE;
 		}
-			
 		break;
 	}
 	return FALSE;
@@ -242,12 +227,10 @@ bool __stdcall DlgAbout(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 	switch (msg)
 	{
 	case WM_INITDIALOG:
-		str.new_element_1(DialogAboutName);
-		str.new_element_2(Copyright, 1024);
-		SetWindowText(hDlg, str._get_1());
+		SetWindowText(hDlg, str._set_and_get(DialogAboutName));
 
 		obj = GetDlgItem(hDlg, ID_ABOUT_STATIC);
-		SendMessage(obj, WM_SETTEXT, (WPARAM)1024, (LPARAM)str._get_2());
+		SendMessage(obj, WM_SETTEXT, (WPARAM)1024, (LPARAM)str._set_and_get(Copyright, 1024));
 		return TRUE;
 		
 	case WM_COMMAND:
@@ -262,6 +245,8 @@ bool __stdcall DlgAbout(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 
 unsigned short MyRegisterClass(HINSTANCE hInstance)
 {
+	hInst = hInstance;
+
 	WNDCLASSEX wcex;
 	wcex.cbSize = sizeof(WNDCLASSEX);
 	wcex.style = CS_HREDRAW | CS_VREDRAW;
@@ -279,13 +264,13 @@ unsigned short MyRegisterClass(HINSTANCE hInstance)
 	return RegisterClassEx(&wcex);
 }
 
-bool InitInstance(HINSTANCE hInstance, int nCmdShow)
+BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
 	HWND hWnd;
 	SmartStringLoad str(window_name);
-	hInst = hInstance;
+
 	hWnd = CreateWindow(wnd_class,
-		str._get_1(),
+		str._get(),
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,

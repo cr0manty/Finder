@@ -72,6 +72,6 @@ Path::operator bool()
 }
 
 Path::Path(const std::string &_main, const std::string &_next) :
-	main_path(_main), next_path(_next)
+	main_path(_main), next_path(_next), selected_index(-1)
 {
 }

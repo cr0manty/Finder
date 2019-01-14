@@ -28,8 +28,6 @@ protected:
 	bool open_proc();
 	bool try_paste();
 	bool _delete(const std::string &);
-	bool start_rename(int);
-	bool end_rename(int);
 public:
 	std::string* make_file_info(const WIN32_FIND_DATA &) const;
 	~Functional();

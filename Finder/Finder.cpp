@@ -3,7 +3,7 @@
 #include <ShlObj.h>
 
 Finder::Finder(HWND _hWnd) :
-	Functional(_hWnd), current_lang(Menu_change_lang_ru)
+	Functional(_hWnd)
 {
 }
 
@@ -14,46 +14,76 @@ Path Finder::_get_path() const
 
 void Finder::create_txt()
 {
-	SmartFinder find;
 	SmartStringLoad str(DefaultTextFile);
-
+	std::string temp = same_name(path.main_path + str._get() + ".txt");
 	try {
-		std::ofstream file(same_name(path.main_path + str._get_1() + ".txt"));
+		std::ofstream file(temp);
 		file.close();
 	}
 
 	catch (...) {
 		return;
 	}
-
+	path.selected_file = temp;
+	path.selected_index = item_count;
 	update_listview();
+	start_rename();
 }
 
 void Finder::create_folder()
 {
-	SmartFinder file;
 	SmartStringLoad str(DefaultFolder);
-
+	std::string temp = same_name(path.main_path + str._get());
 	try {
-		boost::filesystem::create_directory(same_name(path.main_path + str._get_1()));
+		boost::filesystem::create_directory(temp);
 	}
 	catch (...) {
 		return;
 	}
-
+	path.selected_file = temp;
+	path.selected_index = item_count;
 	update_listview();
+	start_rename();
 }
 
-void Finder::rename()
+void Finder::start_rename()
 {
-	start_rename(path.selected_index);
+	temp_edit = ListView_EditLabel(ListView, path.selected_index);
+}
+
+void Finder::end_rename()
+{
+	if (!temp_edit)
+		return;
+
+	char * temp = new char[256];
+	if (!GetWindowText(temp_edit, temp, 256)) {
+		SmartStringLoad str(ErrorEmptyName);
+		SmartStringLoad str_1(Error_info);
+
+		MessageBox(NULL, str._get(), str_1._get(), MB_OK);
+		delete[] temp;
+		return;
+	}
+	std::string new_select = path.main_path + temp;
+	delete[] temp;
+
+	try {
+		boost::filesystem::rename(path.selected_file, new_select);
+	}
+	catch (...) {
+		return;
+	}
+	update_listview();
 }
 
 void Finder::open()
 {
 	if (!path)
 		return;
+
 	SmartFinder file;
+
 	if (file.find(path.selected_file)) {
 		if (file.is_file()) {
 			open_proc();
@@ -152,12 +182,10 @@ void Finder::context_menu(LPARAM lParam)
 
 	char *temp = new char[200];
 	_init_cmenu();
-	RECT rt;
-	GetClientRect(ListView, &rt);
 	TrackPopupMenu(CMenu, TPM_RIGHTBUTTON |
 		TPM_TOPALIGN |
 		TPM_LEFTALIGN,
-		LOWORD(lParam), HIWORD(lParam), 0, hWnd, &LVrt);
+		LOWORD(lParam), HIWORD(lParam), 0, hWnd, NULL);
 
 	int index = ListView_GetNextItem(ListView,
 		-1, LVNI_ALL | LVNI_SELECTED);
@@ -200,10 +228,11 @@ void Finder::delete_item()
 {
 	if (!path)
 		return;
-	SmartStringLoad str(DeleteFileInfo, DeleteFileHeader, 64);
+	SmartStringLoad str(DeleteFileInfo, 64);
+	SmartStringLoad str_1(DeleteFileHeader);
 
-	if (MessageBox(NULL, str._get_1(),
-		str._get_2(), MB_ICONQUESTION | MB_YESNO) == IDYES) {
+	if (MessageBox(NULL, str._get(),
+		str._get(), MB_ICONQUESTION | MB_YESNO) == IDYES) {
 		_delete(path.selected_file);
 		update_listview();
 	}
@@ -240,14 +269,13 @@ void Finder::tree_to_list()
 	HTREEITEM _selected = TreeView_GetSelection(Tree); 
 	TreeView_Expand(Tree, _selected, TVE_EXPAND);
 
-	std::string temp = _get_full_path(_selected);
-	SmartFinder file(temp);
-	path.selected_file = temp;
+	path.selected_file = _get_full_path(_selected);
+	SmartFinder file(path.selected_file);
 	
 	if (!file.is_file()) {
 		if (!TreeView_GetChild(Tree, _selected))
-			temp += '\\';
-		path.main_path = temp;
+			path.selected_file += '\\';
+		path.main_path = path.selected_file;
 		update_listview();
 	}
 	else
@@ -286,11 +314,4 @@ void Finder::minimize_window()
 void Finder::exit()
 {
 	PostQuitMessage(0);
-}
-
-void Finder::change_lang(int _lang)
-{
-	EnableMenuItem(Main_Menu, current_lang, MF_ENABLED);
-	current_lang = _lang;
-	EnableMenuItem(Main_Menu, _lang, MF_DISABLED);
 }

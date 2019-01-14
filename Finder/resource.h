@@ -2,7 +2,6 @@
 // Включаемый файл, созданный в Microsoft Visual C++.
 // Используется Finder.rc
 //
-#define ID_CREATE_TEXT_ITEM             0x00002
 #define ID_BACK_BUTTON                  0x00003
 #define ID_NEXT_BUTTON                  0x00004
 #define ID_PATH_EDIT                    0x00005
@@ -20,12 +19,13 @@
 #define ID_CREATE_FOLDER                0x00017
 #define ID_REFRESH_BTN                  0x00018
 #define ID_SEARCH_BTN                   0x00019
-#define ID_SEARCH_EDIT                  0x00020
+#define ID_CREATE_TEXT_ITEM             0x00020
 #define ID_FINDER_ICON                  111
 #define ID_MAIN_MENU                    114
-#define IDD_DIALOG1                     115
 #define ID_ABOUT                        115
-#define IDR_MENU1                       118
+#define ID_REFRESH_BMP                  120
+#define ID_REFRESH_ICON                 10230
+#define IDB_BITMAP1                     122
 #define IDC_EDIT1                       1006
 #define IDC_EDIT2                       1006
 #define ID_DLG_INFO                     1007
@@ -78,10 +78,11 @@
 #define Copyright                       11033
 #define Menu_file                       11034
 #define Menu_file_exit                  11035
-#define Menu_change_lang_ru             11036
-#define Menu_change_lang_en             11037
-#define Menu_change_lang_ua		        11038
-#define Menu_change_language            11039
+#define Table_name						11036
+#define Table_date_change				11037
+#define Tabble_type						11038
+#define Table_size						11039
+#define Table_date_create				11040
 #define ID_PROGRAM_ABOUT                40004
 #define ID_PROGRAM_CLOSE                40005
 #define ID_LANGUAGE                     40006
@@ -99,8 +100,8 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        120
-#define _APS_NEXT_COMMAND_VALUE         40012
+#define _APS_NEXT_RESOURCE_VALUE        123
+#define _APS_NEXT_COMMAND_VALUE         40016
 #define _APS_NEXT_CONTROL_VALUE         1020
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
