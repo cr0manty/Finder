@@ -9,7 +9,7 @@ void Functional::_init_main_menu()
 
 	SmartStringLoad str;
 	AppendMenu(Main_Menu, MFT_STRING | MF_POPUP, (UINT)File_add, str._set_and_get(Menu_file));
-	{
+	{	
 		AppendMenu(File_add, MFT_STRING, ID_PROGRAM_CLOSE, str._set_and_get(Menu_file_exit));
 	}
 	AppendMenu(Main_Menu, MFT_STRING | MF_POPUP, (UINT)Menu, str._set_and_get(DialogAboutName));
@@ -38,6 +38,7 @@ void Functional::_init_cmenu()
 	AppendMenu(CMenu, MFT_STRING, ID_CUT_ITEM, str._set_and_get(MenuCut));
 	AppendMenu(CMenu, MFT_STRING, ID_COPY_ITEM, str._set_and_get(MenuCopy));
 	AppendMenu(CMenu, MFT_STRING | enabled, ID_PASTE_ITEM, str._set_and_get(MenuPaste));
+
 	AppendMenu(CMenu, MFT_SEPARATOR, 0, NULL);
 	AppendMenu(CMenu, MFT_STRING, ID_LINK_ITEM, str._set_and_get(MenuLink));
 	AppendMenu(CMenu, MFT_STRING, ID_DELETE_ITEM, str._set_and_get(MenuDelete));
@@ -51,18 +52,15 @@ void Functional::_init_tree()
 {
 	SmartStringLoad str(MyComputer_info);
 	TV_INSERTSTRUCT _insert;
-
 	_insert.item.mask = TVIF_TEXT | TVIF_PARAM;
-
 	_insert.hParent = NULL;
 	_insert.hInsertAfter = TVI_LAST;
-
 	_insert.item.pszText = (char*)str._get();
 
 	HTREEITEM MyComputer = TreeView_InsertItem(Tree, &_insert);
 	HTREEITEM Disk;
 
-	for (int i = 0; i < disks->disk_amount; ++i) {
+	for (int i = 0; i < disks->disk_amount; i++) {
 		_insert.hParent = MyComputer;
 		_insert.item.pszText = disks->_get_disk(i);
 		Disk = TreeView_InsertItem(Tree, &_insert);
@@ -95,13 +93,14 @@ bool Functional::_delete(const std::string &_delete)
 
 	if (file.find(_delete)) {
 		try {
-			if (file.is_file())
+			if (file.is_file()) {
 				boost::filesystem::remove(_delete);
-			else if (file.is_directory())
+			}
+			else {
 				boost::filesystem::remove_all(_delete);
-			
+			}
 		}
-		catch (boost::filesystem::filesystem_error &_error) {
+		catch (...) {
 			SmartStringLoad str(ErrorDelete, 64);
 			SmartStringLoad str_1(Error_info);
 
@@ -112,21 +111,24 @@ bool Functional::_delete(const std::string &_delete)
 	return true;
 }
 
-bool Functional::_add_lw_item(const std::string *_item)
+bool Functional::_add_lw_item(WIN32_FIND_DATA _file)
 {
 	int iLastIndex = ListView_GetItemCount(ListView);
+	FileInfo file(_file);
 
 	LVITEM lvi;
 	lvi.mask = LVIF_TEXT;
 	lvi.cchTextMax = 1000;
 	lvi.iItem = iLastIndex;
-	lvi.pszText = (LPSTR)_item[0].c_str();
+	lvi.pszText = (LPSTR)file.info(0);
 	lvi.iSubItem = 0;
 
 	if (ListView_InsertItem(ListView, &lvi) == -1)
 		return false;
-	for (int i = 1; i < number_colum; i++)
-		ListView_SetItemText(ListView, iLastIndex, i, (LPSTR)_item[i].c_str());
+
+	for (int i = 1; i < number_colum; i++) {
+		ListView_SetItemText(ListView, iLastIndex, i, (LPSTR)file.info(i));
+	}
 
 	return true;
 }
@@ -146,61 +148,6 @@ bool Functional::open_proc()
 
 	if (ShellExecuteEx(&sei))
 		return true;
-}
-
-std::string * Functional::make_file_info(const WIN32_FIND_DATA &file) const
-{
-	SYSTEMTIME sys_time;
-	char *buffer;
-
-	std::string *_info = new std::string[5];
-	_info[0] = file.cFileName;
-
-	FileTimeToSystemTime(&file.ftLastAccessTime, &sys_time);
-	buffer = new char[256];
-
-	sprintf(buffer,
-		"%02d.%02d.%d %02d:%02d:%02d",
-		sys_time.wDay,
-		sys_time.wMonth,
-		sys_time.wYear,
-		sys_time.wHour,
-		sys_time.wMinute,
-		sys_time.wSecond);
-
-	_info[1] = buffer;
-	delete[] buffer;
-
-	if (file.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE) {
-		auto i = _info[0].rfind('.');
-		for (++i; i < _info[0].size(); i++)
-			_info[2] += _info[0][i];
-		_info[3] = std::to_string((file.nFileSizeHigh * MAXDWORD) + file.nFileSizeLow) + " สม";
-
-	}
-	else {
-		SmartStringLoad str(Folder_info);
-
-		_info[2] = str._get();
-		_info[3] = " ";
-	}
-
-	FileTimeToSystemTime(&file.ftCreationTime, &sys_time);
-	buffer = new char[256];
-
-	sprintf(buffer,
-		"%02d.%02d.%d %02d:%02d:%02d",
-		sys_time.wDay,
-		sys_time.wMonth,
-		sys_time.wYear,
-		sys_time.wHour,
-		sys_time.wMinute,
-		sys_time.wSecond);
-
-	_info[4] = buffer;
-	delete[] buffer;
-
-	return _info;
 }
 
 std::string Functional::_getPath(HTREEITEM _item)
@@ -243,7 +190,7 @@ std::string Functional::same_name(const std::string &_name)
 			temp = _name;
 			temp.insert(temp.rfind('.'), " (" + std::to_string(i++) + ")");
 		}
-		else if (file.is_directory()) {
+		else {
 			temp = _name;
 			temp += " (" + std::to_string(i++) + ")";
 		}
@@ -273,10 +220,12 @@ bool Functional::try_paste()
 
 	SmartFinder check_file(manip.file);
 	try {
-		if (check_file.is_file())
+		if (check_file.is_file()) {
 			boost::filesystem::copy_file(manip.file, temp, boost::filesystem::copy_option::fail_if_exists);
-		else if (check_file.is_directory())
+		}
+		else {
 			boost::filesystem::copy_directory(manip.file, path.main_path + temp.substr(temp.rfind('\\', temp.size() - 1)));
+		}
 	}
 	catch (...) {
 		SmartStringLoad str(ErrorPaste);
@@ -305,7 +254,7 @@ void Functional::update_listview()
 	if (file.find(path.main_path + "*")) {
 		do {
 			if (file.hidden()) {
-				_add_lw_item(make_file_info(file._get()));
+				_add_lw_item(file._get());
 			}
 		} while (file.next());
 	}
@@ -330,7 +279,7 @@ void Functional::tree_load(HTREEITEM _item, const std::string &_path)
 	_insert.item.mask = TVIF_TEXT;
 
 	do {
-		if (file.is_directory() && file.hidden()) {
+		if (!file.is_file() && file.hidden()) {
 			_insert.item.pszText = file._get().cFileName;
 			TreeView_InsertItem(Tree, &_insert);
 		}

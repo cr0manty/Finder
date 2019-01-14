@@ -27,11 +27,6 @@ bool SmartFinder::is_file() const
 	return file.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE;
 }
 
-bool SmartFinder::is_directory() const
-{
-	return file.dwFileAttributes | FILE_ATTRIBUTE_DIRECTORY;
-}
-
 bool SmartFinder::hidden() const
 {
 	return !(file.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) &&

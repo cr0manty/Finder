@@ -125,6 +125,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Additional.cpp" />
+    <ClCompile Include="FileInfo.cpp" />
     <ClCompile Include="Finder.cpp" />
     <ClCompile Include="Functional.cpp" />
     <ClCompile Include="MainFunc.cpp" />
@@ -135,6 +136,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Additional.h" />
+    <ClInclude Include="FileInfo.h" />
     <ClInclude Include="Finder.h" />
     <ClInclude Include="Functional.h" />
     <ClInclude Include="includes.h" />

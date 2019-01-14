@@ -62,19 +62,20 @@ void Finder::end_rename()
 		SmartStringLoad str_1(Error_info);
 
 		MessageBox(NULL, str._get(), str_1._get(), MB_OK);
-		delete[] temp;
-		return;
+		goto error;
 	}
-	std::string new_select = path.main_path + temp;
-	delete[] temp;
 
 	try {
+		std::string new_select = path.main_path + temp;
 		boost::filesystem::rename(path.selected_file, new_select);
 	}
 	catch (...) {
 		return;
 	}
 	update_listview();
+error:
+	delete[] temp;
+
 }
 
 void Finder::open()
@@ -88,7 +89,7 @@ void Finder::open()
 		if (file.is_file()) {
 			open_proc();
 		}
-		else if (file.is_directory()) {
+		else {
 			path.main_path = path.selected_file + '\\';
 			update_listview();
 		}
@@ -112,12 +113,13 @@ void Finder::create_link()
 		psl->SetPath(path.selected_file.c_str());
 		i = path.selected_file.rfind('.');
 
-		if (i > path.selected_file.size() - 5 && i != std::string::npos)
+		if (i > path.selected_file.size() - 5 && i != std::string::npos) {
 			path.selected_file.erase(i);
-			
+		}
+
 		while (file.find(path.selected_file + type)) {
 				type = " (" + std::to_string(amount++) + ").lnk";
-			}
+		}
 
 		hres = psl->QueryInterface(IID_IPersistFile, (void**)&ppf);
 		if (SUCCEEDED(hres)) {
@@ -219,9 +221,9 @@ void Finder::disk_change(WPARAM wParam)
 	char *temp = new char[6];
 	GetDlgItemText(hWnd, ID_DISKLIST_CB, temp, 5);
 	path.main_path = temp;
-	update_listview();
-
 	delete[] temp;
+
+	update_listview();
 }
 
 void Finder::delete_item()
@@ -273,13 +275,15 @@ void Finder::tree_to_list()
 	SmartFinder file(path.selected_file);
 	
 	if (!file.is_file()) {
-		if (!TreeView_GetChild(Tree, _selected))
+		if (!TreeView_GetChild(Tree, _selected)) {
 			path.selected_file += '\\';
+		}
 		path.main_path = path.selected_file;
 		update_listview();
 	}
-	else
+	else {
 		open_proc();
+	}
 }
 
 void Finder::tree_show(LPARAM lParam)

@@ -80,7 +80,7 @@
 #define Menu_file_exit                  11035
 #define Table_name						11036
 #define Table_date_change				11037
-#define Tabble_type						11038
+#define Table_type						11038
 #define Table_size						11039
 #define Table_date_create				11040
 #define ID_PROGRAM_ABOUT                40004

@@ -1,7 +1,6 @@
 #pragma once
 #include "Functional.h"
 
-
 class Finder : public Functional
 {
 public:
@@ -12,7 +11,6 @@ public:
 	void create_folder();
 	void start_rename();
 	void end_rename();
-
 	void open();
 	void create_link();
 	void show_back();

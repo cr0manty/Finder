@@ -21,8 +21,8 @@ void Objects::resize()
 {
 	if (!this)
 		return;
-	HWND temp = NULL;
 
+	HWND temp = NULL;
 	GetClientRect(hWnd, &WindowRT);
 	LVrt = { WindowRT.left + 300, WindowRT.top + 25, WindowRT.right, WindowRT.bottom };
 
@@ -30,22 +30,6 @@ void Objects::resize()
 	SetWindowPos(Tree, temp, WindowRT.left, WindowRT.top + 25, WindowRT.left + 300, WindowRT.bottom, NULL);
 	SetWindowPos(Edit, temp, WindowRT.left + 300, WindowRT.top, WindowRT.right - 355, 25, NULL);
 	SetWindowPos(ComboBox, temp, WindowRT.right - 55, WindowRT.top, 55, 200, NULL);
-}
-
-Objects::~Objects()
-{
-	DestroyMenu(CMenu);
-	DestroyMenu(Main_Menu);
-
-	DestroyWindow(Edit);
-	DestroyWindow(Tree);
-	DestroyWindow(ListView);
-	DestroyWindow(ComboBox);
-	DestroyWindow(hWnd);
-
-	for (int i = 0; i < buttons_amount; i++)
-		DestroyWindow(Button[i]);
-	delete[] Button;
 }
 
 void Objects::_create_listview()
@@ -130,6 +114,24 @@ void Objects::_set_listviw_colum()
 	{
 		lv.pszText = (LPSTR)header[i].c_str();
 		index = ListView_InsertColumn(ListView, i, &lv);
-		if (index == -1) break;
+		if (index == -1) 
+			break;
 	}
+}
+
+Objects::~Objects()
+{
+	DestroyMenu(CMenu);
+	DestroyMenu(Main_Menu);
+
+	DestroyWindow(Edit);
+	DestroyWindow(Tree);
+	DestroyWindow(ListView);
+	DestroyWindow(ComboBox);
+	DestroyWindow(hWnd);
+
+	for (int i = 0; i < buttons_amount; i++)
+		DestroyWindow(Button[i]);
+
+	delete[] Button;
 }
