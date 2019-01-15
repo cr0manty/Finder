@@ -24,9 +24,11 @@ protected:
 	std::string _get_full_path(HTREEITEM);
 	std::string same_name(const std::string &);
 
-	bool _add_lw_item(WIN32_FIND_DATA);
+	bool _add_lw_item(const std::string *);
 	bool open_proc();
 	bool try_paste();
 	bool _delete(const std::string &);
+public:
+	std::string * make_file_info(const WIN32_FIND_DATA &file) const;
 	~Functional();
 };

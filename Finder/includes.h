@@ -7,7 +7,6 @@
 #include "Objects.h"
 #include "Additional.h"
 #include "SmartFinder.h"
-#include "FileInfo.h"
 #include "SmartStringLoad.h"
 
 #pragma comment(lib, "ComCtl32.Lib")
