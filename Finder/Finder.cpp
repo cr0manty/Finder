@@ -25,8 +25,8 @@ void Finder::create_txt()
 		return;
 	}
 	path.selected_file = temp;
-	path.selected_index = item_count;
 	update_listview();
+	path.selected_index = path.item_amount - 1;
 	start_rename();
 }
 
@@ -41,8 +41,8 @@ void Finder::create_folder()
 		return;
 	}
 	path.selected_file = temp;
-	path.selected_index = item_count;
 	update_listview();
+	path.selected_index = path.item_amount - 1;
 	start_rename();
 }
 
@@ -238,8 +238,9 @@ void Finder::delete_item()
 
 	if (MessageBox(NULL, str._get(),
 		str._get(), MB_ICONQUESTION | MB_YESNO) == IDYES) {
-		_delete(path.selected_file);
-		update_listview();
+		if (_delete(path.selected_file)) {
+			update_listview();
+		}
 	}
 }
 

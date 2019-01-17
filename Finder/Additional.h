@@ -32,6 +32,7 @@ struct Path
 	std::string next_path;
 	std::string	selected_file;
 	int selected_index;
+	int item_amount;
 
 	Path(const std::string &, const std::string &);
 	operator bool();

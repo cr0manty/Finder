@@ -92,6 +92,8 @@ void Objects::_create_hotkey()
 	RegisterHotKey(hWnd, ID_PASTE_HK, MOD_CONTROL, 0x56);
 	RegisterHotKey(hWnd, ID_REFRESH_HK, MOD_CONTROL, 0x52);
 	RegisterHotKey(hWnd, ID_MINIM_HK, MOD_CONTROL, 0x57);
+	RegisterHotKey(hWnd, ID_CREATE_FOLDER, MOD_CONTROL, 0x4E);
+	RegisterHotKey(hWnd, ID_CREATE_TEXT_ITEM, MOD_CONTROL, 0x46);
 
 	RegisterHotKey(hWnd, ID_BACK_HK, MOD_ALT, VK_LEFT);
 	RegisterHotKey(hWnd, ID_NEXT_HK, MOD_ALT, VK_RIGHT);

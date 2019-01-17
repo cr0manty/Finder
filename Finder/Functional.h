@@ -5,7 +5,6 @@
 class Functional : public Objects
 {
 protected:
-	int item_count;
 	HWND temp_edit;
 	Disk *disks;
 	Path path;

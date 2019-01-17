@@ -258,7 +258,7 @@ void Functional::update_listview()
 		} while (file.next());
 	}
 
-	item_count = ListView_GetItemCount(ListView);
+	path.item_amount = ListView_GetItemCount(ListView);
 }
 
 Functional::~Functional()

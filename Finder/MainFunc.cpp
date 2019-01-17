@@ -142,6 +142,15 @@ __int64 __stdcall WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case ID_NEXT_HK:
 			main->show_next();
 			break;
+
+		case ID_CREATE_FOLDER:
+			main->create_folder();
+			break;
+
+		case ID_CREATE_TEXT_ITEM:
+			main->create_txt();
+			break;
+
 		}
 		break;
 
