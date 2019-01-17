@@ -202,7 +202,10 @@ void Finder::context_menu(LPARAM lParam)
 void Finder::file_manip(bool _cut)
 {
 	if (path) {
-		manip = Manip(path.selected_file, path.main_path, _cut);
+		if (manip)
+			delete manip;
+
+		manip = new Manip(path.selected_file, path.main_path, _cut);
 	}
 }
 
@@ -244,7 +247,7 @@ void Finder::make_paste()
 {
 	if (try_paste()) {
 		update_listview();
-		manip.clear();
+		manip->clear();
 	}
 }
 

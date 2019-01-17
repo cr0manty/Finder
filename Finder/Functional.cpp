@@ -111,26 +111,26 @@ bool Functional::_delete(const std::string &_delete)
 	return true;
 }
 
-bool Functional::_add_lw_item(const std::string *_item)
+bool Functional::_add_lw_item(WIN32_FIND_DATA _file)
 {
-	int iLastIndex = ListView_GetItemCount(ListView);
+	info = new FileInfo(_file);
 
+	int iLastIndex = ListView_GetItemCount(ListView);
 	LVITEM lvi;
 	lvi.mask = LVIF_TEXT;
 	lvi.cchTextMax = 1000;
 	lvi.iItem = iLastIndex;
-	lvi.pszText = (LPSTR)_item[0].c_str();
+	lvi.pszText = (LPSTR)info->_get_info(0);
 	lvi.iSubItem = 0;
-
-	if (ListView_InsertItem(ListView, &lvi) == -1)
-		return false;
+	ListView_InsertItem(ListView, &lvi);
 
 	for (int i = 1; i < number_colum; i++) {
-		ListView_SetItemText(ListView, iLastIndex, i, (LPSTR)_item[i].c_str());
+		ListView_SetItemText(ListView, iLastIndex, i, (char*)info->_get_info(i));
 	}
+	delete info;
+
 	return true;
 }
-
 
 bool Functional::open_proc()
 {
@@ -212,18 +212,18 @@ bool Functional::try_paste()
 	if (!manip)
 		return false;
 
-	std::string temp = manip.file;
-	if (manip.path == path.main_path) {
-		temp = same_name(manip.file);
+	std::string temp = manip->file;
+	if (manip->path == path.main_path) {
+		temp = same_name(manip->file);
 	}
 
-	SmartFinder check_file(manip.file);
+	SmartFinder check_file(manip->file);
 	try {
 		if (check_file.is_file()) {
-			boost::filesystem::copy_file(manip.file, temp, boost::filesystem::copy_option::fail_if_exists);
+			boost::filesystem::copy_file(manip->file, path.main_path + temp.substr(temp.rfind('\\', temp.size() - 1)), boost::filesystem::copy_option::fail_if_exists);
 		}
 		else {
-			boost::filesystem::copy_directory(manip.file, path.main_path + temp.substr(temp.rfind('\\', temp.size() - 1)));
+			boost::filesystem::copy_directory(manip->file, path.main_path + temp.substr(temp.rfind('\\', temp.size() - 1)));
 		}
 	}
 	catch (...) {
@@ -234,8 +234,8 @@ bool Functional::try_paste()
 		return false;
 	}
 
-	if (manip.aDelete) {
-		if (!_delete(manip.file))
+	if (manip->aDelete) {
+		if (!_delete(manip->file))
 			return false;
 	}
 
@@ -253,7 +253,7 @@ void Functional::update_listview()
 	if (file.find(path.main_path + "*")) {
 		do {
 			if (file.hidden()) {
-				_add_lw_item(make_file_info(file._get()));
+				_add_lw_item(file._get());
 			}
 		} while (file.next());
 	}
@@ -264,6 +264,8 @@ void Functional::update_listview()
 Functional::~Functional()
 {
 	delete disks;
+	if (manip)
+		delete manip;
 }
 
 void Functional::tree_load(HTREEITEM _item, const std::string &_path)
@@ -283,59 +285,4 @@ void Functional::tree_load(HTREEITEM _item, const std::string &_path)
 			TreeView_InsertItem(Tree, &_insert);
 		}
 	} while (file.next());
-}
-
-std::string * Functional::make_file_info(const WIN32_FIND_DATA &file) const
-{
-	SYSTEMTIME sys_time;
-	char *buffer;
-
-	std::string *_info = new std::string[5];
-	_info[0] = file.cFileName;
-
-	FileTimeToSystemTime(&file.ftLastAccessTime, &sys_time);
-	buffer = new char[256];
-
-	sprintf(buffer,
-		"%02d.%02d.%d %02d:%02d:%02d",
-		sys_time.wDay,
-		sys_time.wMonth,
-		sys_time.wYear,
-		sys_time.wHour,
-		sys_time.wMinute,
-		sys_time.wSecond);
-
-	_info[1] = buffer;
-	delete[] buffer;
-
-	if (file.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE) {
-		auto i = _info[0].rfind('.');
-		for (++i; i < _info[0].size(); i++)
-			_info[2] += _info[0][i];
-		_info[3] = std::to_string((file.nFileSizeHigh * MAXDWORD) + file.nFileSizeLow) + " สม";
-
-	}
-	else {
-		SmartStringLoad str(Folder_info);
-
-		_info[2] = str._get();
-		_info[3] = " ";
-	}
-
-	FileTimeToSystemTime(&file.ftCreationTime, &sys_time);
-	buffer = new char[256];
-
-	sprintf(buffer,
-		"%02d.%02d.%d %02d:%02d:%02d",
-		sys_time.wDay,
-		sys_time.wMonth,
-		sys_time.wYear,
-		sys_time.wHour,
-		sys_time.wMinute,
-		sys_time.wSecond);
-
-	_info[4] = buffer;
-	delete[] buffer;
-
-	return _info;
 }

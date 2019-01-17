@@ -13,6 +13,19 @@ public:
 	~Disk();
 };
 
+class FileInfo
+{
+	WIN32_FIND_DATA file;
+	void create_time();
+	void change_time();
+	std::string temp;
+	bool is_file;
+public:
+	FileInfo(WIN32_FIND_DATA);
+	const char * _get_info(int);
+	const char * _get_header(int);
+};
+
 struct Path 
 {
 	std::string main_path;
@@ -35,4 +48,3 @@ struct Manip
 	operator bool();
 	void clear();
 };
-

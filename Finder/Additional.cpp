@@ -1,5 +1,5 @@
 #define _CRT_SECURE_NO_WARNINGS
-#include "Additional.h"
+#include "includes.h"
 
 Manip::Manip()
 {
@@ -59,4 +59,129 @@ Path::operator bool()
 Path::Path(const std::string &_main, const std::string &_next) :
 	main_path(_main), next_path(_next), selected_index(-1)
 {
+}
+
+void FileInfo::create_time()
+{
+	SYSTEMTIME sys_time;
+
+	FileTimeToSystemTime(&file.ftCreationTime, &sys_time);
+	char *buffer = new char[256];
+
+	sprintf(buffer,
+		"%02d.%02d.%d %02d:%02d:%02d",
+		sys_time.wDay,
+		sys_time.wMonth,
+		sys_time.wYear,
+		sys_time.wHour,
+		sys_time.wMinute,
+		sys_time.wSecond);
+
+	temp = buffer;
+	delete[] buffer;
+}
+
+void  FileInfo::change_time()
+{
+	SYSTEMTIME sys_time;
+
+	FileTimeToSystemTime(&file.ftLastWriteTime, &sys_time);
+	char *buffer = new char[64];
+
+	sprintf(buffer,
+		"%02d.%02d.%d %02d:%02d:%02d",
+		sys_time.wDay,
+		sys_time.wMonth,
+		sys_time.wYear,
+		sys_time.wHour,
+		sys_time.wMinute,
+		sys_time.wSecond);
+
+	temp = buffer;
+	delete[] buffer;
+
+}
+
+FileInfo::FileInfo(WIN32_FIND_DATA _file) :
+	file(_file)
+{
+	is_file = file.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE;
+}
+
+const char * FileInfo::_get_info(int _switch)
+{
+	SmartStringLoad str;
+
+	switch(_switch)
+	{
+	case 0:
+		return file.cFileName;
+		
+	case 1:
+		change_time();
+		break;
+
+	case 2:
+		if (is_file) {
+			temp = file.cFileName;
+			temp = temp.substr(temp.rfind('.') + 1, temp.size() - 1).c_str();
+		}
+		else {
+			temp = str._set_and_get(Folder_info);
+		}
+		break;
+
+	case 3:
+		if (is_file) {
+			temp = std::to_string((file.nFileSizeHigh * MAXDWORD) + file.nFileSizeLow) + " สม";
+			break;
+		}
+		else {
+			return " ";
+		}
+
+	case 4:
+		create_time();
+		break;
+
+	default:
+		return " ";
+	}
+	return temp.c_str();
+}
+
+const char * FileInfo::_get_header(int _switch)
+{
+	SmartStringLoad str;
+	
+	switch (_switch)
+	{
+	case 0:
+		temp = str._set_and_get(Table_name);
+		break;
+
+	case 1:
+		temp = str._set_and_get(Table_date_change);
+		break;
+
+	case 2:
+		temp = str._set_and_get(Table_type);
+		break;
+
+	case 3:
+		temp =  str._set_and_get(Table_size);
+		break;
+
+	case 4:
+		temp = str._set_and_get(Table_date_create);
+		break;
+
+	case 5:
+		temp = str._set_and_get(PathInfo);
+		break;
+	default:
+		return " ";
+	}
+
+	return temp.c_str();
 }

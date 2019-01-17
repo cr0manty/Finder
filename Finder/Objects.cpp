@@ -99,8 +99,7 @@ void Objects::_create_hotkey()
 
 void Objects::_set_listviw_colum()
 {
-	std::string header[5] = { (char*)"Имя", (char*)"Дата изменения", (char*)"Тип", (char*)"Размер" , (char*)"Дата создания" };
-
+	SmartStringLoad str;
 	RECT rt;
 	GetClientRect(ListView, &rt);
 	int index = -1;
@@ -110,9 +109,8 @@ void Objects::_set_listviw_colum()
 	lv.cx = (rt.right - rt.left) / number_colum; 
 	lv.cchTextMax = 1000;
 
-	for (int i = 0; i < number_colum; i++)
-	{
-		lv.pszText = (LPSTR)header[i].c_str();
+	for (int i = 0; i < number_colum; i++) {
+		lv.pszText = (LPSTR)str._set_and_get(Table_name + i);
 		index = ListView_InsertColumn(ListView, i, &lv);
 		if (index == -1) 
 			break;
@@ -135,3 +133,4 @@ Objects::~Objects()
 
 	delete[] Button;
 }
+

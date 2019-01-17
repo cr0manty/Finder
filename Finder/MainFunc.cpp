@@ -168,9 +168,9 @@ bool __stdcall DlgInfo(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 	HWND Object_info[6];
 
 	SmartFinder file;
-	std::string *temp;
 	Finder *main;
 	SmartStringLoad str;
+	FileInfo *info;
 
 	switch (msg)
 	{
@@ -178,9 +178,13 @@ bool __stdcall DlgInfo(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 		SetWindowText(hDlg, str._set_and_get(DialogAboutName));
 
 		main = (Finder*)lParam;
-		if (file.find(main->_get_path().selected_file))
-			temp = main->make_file_info(file._get());
-		else return FALSE;
+		if (file.find(main->_get_path().selected_file) && main->_get_path().selected_file.size() > 3) {
+			info = new FileInfo(file._get());
+		}
+		else {
+			EndDialog(hDlg, LOWORD(wParam));
+			return false;
+		}
 
 		Object[0] = GetDlgItem(hDlg, IDC_STATIC1);
 		Object[2] = GetDlgItem(hDlg, IDC_STATIC2);
@@ -197,24 +201,24 @@ bool __stdcall DlgInfo(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 		Object_info[1] = GetDlgItem(hDlg, IDC_STATIC_STATIC6);
 
 
-		for (int i = Table_name, j = 0; i <= Table_date_create; i++, j++) {
-			SendMessage(Object[j], WM_SETTEXT, (WPARAM)255, (LPARAM)temp[j].c_str());
-			SendMessage(Object_info[j], WM_SETTEXT, (WPARAM)255, (LPARAM)str._set_and_get(i));
+		for (int i = 0; i < 5 ; i++) {
+			SendMessage(Object[i], WM_SETTEXT, (WPARAM)255, (LPARAM)info->_get_info(i));
+			SendMessage(Object_info[i], WM_SETTEXT, (WPARAM)255, (LPARAM)info->_get_header(i));
 		}
 
 		SendMessage(Object[5], WM_SETTEXT, (WPARAM)255, (LPARAM)main->_get_path().main_path.c_str());
-		SendMessage(Object_info[5], WM_SETTEXT, (WPARAM)255, (LPARAM)str._set_and_get(PathInfo));
-		delete[] temp;
-		return TRUE;
+		SendMessage(Object_info[5], WM_SETTEXT, (WPARAM)255, (LPARAM)info->_get_header(5));
+		delete info;
+		return true;
 
 	case WM_COMMAND:
 		if (LOWORD(wParam) == ID_BUTTON_DLG || LOWORD(wParam) == IDCANCEL) {
 			EndDialog(hDlg, LOWORD(wParam));
-			return TRUE;
+			return true;
 		}
 		break;
 	}
-	return FALSE;
+	return false;
 }
 
 bool __stdcall DlgAbout(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -283,3 +287,4 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 	return true;
 }
+
