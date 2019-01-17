@@ -35,7 +35,7 @@ void Disk::add_disk(char *_name)
 		return;
 
 	disk[index] = new char[4];
-	strcpy(disk[index], _name);
+	strcpy(disk[index++], _name);
 }
 
 char * Disk::_get_disk(int _index) const
