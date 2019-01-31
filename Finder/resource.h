@@ -83,6 +83,7 @@
 #define Table_type						11038
 #define Table_size						11039
 #define Table_date_create				11040
+#define Local_disk						11041
 #define ID_PROGRAM_ABOUT                40004
 #define ID_PROGRAM_CLOSE                40005
 #define ID_LANGUAGE                     40006

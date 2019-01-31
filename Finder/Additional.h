@@ -44,7 +44,6 @@ struct Manip
 	std::string path;
 	bool aDelete;
 
-	Manip();
 	Manip(const std::string &, const std::string &, bool);
 	operator bool();
 	void clear();

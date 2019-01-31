@@ -73,8 +73,8 @@ void Functional::_init_tree()
 
 void Functional::disk_list()
 {
-	char all_disks[512], *disk;
-	int amount = GetLogicalDriveStrings(sizeof(all_disks), all_disks);
+	char *all_disks =  new char[512], *disk;
+	int amount = GetLogicalDriveStrings(512, all_disks);
 
 	disk = all_disks;
 	disks = new Disk(amount / 4);
@@ -85,6 +85,7 @@ void Functional::disk_list()
 		disk += 4;
 	}
 	SendMessage(ComboBox, CB_SETCURSEL, NULL, (LPARAM)1);
+	delete[] all_disks;
 }
 
 bool Functional::_delete(const std::string &_delete)
@@ -151,7 +152,12 @@ bool Functional::open_proc()
 
 std::string Functional::_getPath(HTREEITEM _item)
 {
-	char *str = new char[100];
+	static char *str;
+
+	if (str)
+		delete[] str;
+
+	str = new char[100];
 	TV_ITEM tv;
 
 	tv.mask = TVIF_TEXT | TVIF_HANDLE;

@@ -1,10 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "includes.h"
 
-Manip::Manip()
-{
-}
-
 Manip::Manip(const std::string &_buffer, const std::string &_path, bool _cut) :
 	file(_buffer), aDelete(_cut), path(_path)
 {
@@ -24,7 +20,6 @@ void Manip::clear()
 Disk::Disk(int _amount) :
 	disk_amount(_amount), disk(new char*[_amount])
 {
-	disk = new char*[disk_amount];
 }
 
 void Disk::add_disk(char *_name)
@@ -66,7 +61,7 @@ void FileInfo::create_time()
 	SYSTEMTIME sys_time;
 
 	FileTimeToSystemTime(&file.ftCreationTime, &sys_time);
-	char *buffer = new char[256];
+	char *buffer = new char[32];
 
 	sprintf(buffer,
 		"%02d.%02d.%d %02d:%02d:%02d",
@@ -81,12 +76,12 @@ void FileInfo::create_time()
 	delete[] buffer;
 }
 
-void  FileInfo::change_time()
+void FileInfo::change_time()
 {
 	SYSTEMTIME sys_time;
 
 	FileTimeToSystemTime(&file.ftLastWriteTime, &sys_time);
-	char *buffer = new char[64];
+	char *buffer = new char[32];
 
 	sprintf(buffer,
 		"%02d.%02d.%d %02d:%02d:%02d",
@@ -179,9 +174,9 @@ const char * FileInfo::_get_header(int _switch)
 	case 5:
 		temp = str._set_and_get(PathInfo);
 		break;
+
 	default:
 		return " ";
 	}
-
 	return temp.c_str();
 }

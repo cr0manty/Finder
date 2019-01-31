@@ -34,12 +34,14 @@ void Finder::create_folder()
 {
 	SmartStringLoad str(DefaultFolder);
 	std::string temp = same_name(path.main_path + str._get());
+
 	try {
 		boost::filesystem::create_directory(temp);
 	}
 	catch (...) {
 		return;
 	}
+
 	path.selected_file = temp;
 	update_listview();
 	path.selected_index = path.item_amount - 1;
@@ -66,8 +68,7 @@ void Finder::end_rename()
 	}
 
 	try {
-		std::string new_select = path.main_path + temp;
-		boost::filesystem::rename(path.selected_file, new_select);
+		boost::filesystem::rename(path.selected_file, path.main_path + temp);
 	}
 	catch (...) {
 		return;
@@ -100,15 +101,15 @@ void Finder::create_link()
 {
 	std::string type = " (1).lnk";
 	IShellLink  *psl;
-	int amount = 2;
 	HRESULT hres;
 	SmartFinder file;
 	CoInitialize(NULL);
+
 	hres = CoCreateInstance(CLSID_ShellLink, NULL,
 		CLSCTX_INPROC_SERVER, IID_IShellLink, (void**)&psl);
 	if (SUCCEEDED(hres))
 	{
-		int i;
+		int amount = 2, i;
 		IPersistFile  *ppf;
 		psl->SetPath(path.selected_file.c_str());
 		i = path.selected_file.rfind('.');
@@ -123,10 +124,11 @@ void Finder::create_link()
 
 		hres = psl->QueryInterface(IID_IPersistFile, (void**)&ppf);
 		if (SUCCEEDED(hres)) {
-			wchar_t  wsz[MAX_PATH];
+			wchar_t  *wsz = new wchar_t[MAX_PATH];
 			MultiByteToWideChar(CP_ACP, 0, (path.selected_file + type).c_str(), -1, wsz, MAX_PATH);
 			hres = ppf->Save(wsz, true);
 			ppf->Release();
+			delete[] wsz;
 		}
 		psl->Release();
 		CoUninitialize();
@@ -158,7 +160,6 @@ void Finder::show_next()
 void Finder::select_item()
 {
 	char *temp = new char[200];
-	temp[0] = 0;
 	int index = ListView_GetNextItem(ListView,
 		-1, LVNI_ALL | LVNI_SELECTED);
 	ListView_GetItemText(ListView, index, 0, temp, 200);
@@ -276,7 +277,12 @@ void Finder::tree_to_list()
 	TreeView_Expand(Tree, _selected, TVE_EXPAND);
 
 	path.selected_file = _get_full_path(_selected);
+	SmartStringLoad str(MyComputer_info);
+	if (path.selected_file == str._get())
+		return;
+
 	SmartFinder file(path.selected_file);
+
 	
 	if (!file.is_file()) {
 		if (!TreeView_GetChild(Tree, _selected)) {
@@ -310,7 +316,6 @@ void Finder::tree_show(LPARAM lParam)
 				tree_load(_selected_child, _get_full_path(_selected_child) + "\\*");
 			}
 		} while (_selected_child = TreeView_GetNextSibling(Tree, _selected_child));
-
 	}
 }
 
