@@ -132,6 +132,7 @@
     <ClCompile Include="SmartFinder.cpp" />
     <ClCompile Include="SmartStringLoad.cpp" />
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Additional.h" />
@@ -142,6 +143,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="SmartFinder.h" />
     <ClInclude Include="SmartStringLoad.h" />
+    <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Finder.rc" />

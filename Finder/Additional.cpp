@@ -51,8 +51,8 @@ Path::operator bool()
 	return (selected_file != main_path && selected_file.size());
 }
 
-Path::Path(const std::string &_main, const std::string &_next) :
-	main_path(_main), next_path(_next), selected_index(-1)
+Path::Path(const std::string &_path) :
+	main_path(_path), next_path(_path), selected_index(-1)
 {
 }
 
@@ -122,7 +122,7 @@ const char * FileInfo::_get_info(int _switch)
 			temp = temp.substr(temp.rfind('.') + 1, temp.size() - 1).c_str();
 		}
 		else {
-			temp = str._set_and_get(Folder_info);
+			temp = str._get(Folder_info);
 		}
 		break;
 
@@ -152,27 +152,27 @@ const char * FileInfo::_get_header(int _switch)
 	switch (_switch)
 	{
 	case 0:
-		temp = str._set_and_get(Table_name);
+		temp = str._get(Table_name);
 		break;
 
 	case 1:
-		temp = str._set_and_get(Table_date_change);
+		temp = str._get(Table_date_change);
 		break;
 
 	case 2:
-		temp = str._set_and_get(Table_type);
+		temp = str._get(Table_type);
 		break;
 
 	case 3:
-		temp =  str._set_and_get(Table_size);
+		temp =  str._get(Table_size);
 		break;
 
 	case 4:
-		temp = str._set_and_get(Table_date_create);
+		temp = str._get(Table_date_create);
 		break;
 
 	case 5:
-		temp = str._set_and_get(PathInfo);
+		temp = str._get(PathInfo);
 		break;
 
 	default:

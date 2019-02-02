@@ -5,28 +5,37 @@ class Finder : public Functional
 {
 public:
 	Finder(HWND);
-	Path _get_path() const;
+	Path & _get_path() const;
 
-	void create_txt();
-	void create_folder();
-	void start_rename();
-	void end_rename();
-	void open();
-	void create_link();
-	void show_back();
-	void show_next();
-	void select_item();
 	void context_menu(LPARAM);
+	void create_folder();
+	void create_link();
+	void create_txt();
+
+	void delete_item();
+	void disk_change(WPARAM);
+
+	void end_rename();
+	void exit();
+
 	void file_manip(bool);
 	void fix_size(LPARAM);
-	void disk_change(WPARAM);
-	void delete_item();
+
 	void make_paste();
-	void show_info();
 	void make_refresh();
+	void minimize_window();
+
+	void open();
+
+	void select_item();
 	void show_about();
+	void show_back();
+	void show_info();
+	void show_next();
+	void start_rename();
+
 	void tree_to_list();
 	void tree_show(LPARAM);
-	void minimize_window();
-	void exit();
+
+	~Finder();
 };

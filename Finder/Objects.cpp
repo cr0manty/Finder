@@ -7,7 +7,7 @@ bool Objects::mouse_cmenu(const POINT &_p)
 }
 
 Objects::Objects(HWND _hWnd, int _size) :
-	hWnd(_hWnd), number_colum(5), buttons_amount(_size)
+	hWnd(_hWnd), number_colum(5), buttons_amount(_size), hInst(GetModuleHandle(NULL))
 {
 	Button = new HWND[buttons_amount];
 	_create_listview();
@@ -41,10 +41,15 @@ void Objects::_create_listview()
 	RECT WindowRT;
 	GetClientRect(hWnd, &WindowRT);
 
-	ListView = CreateWindow(WC_LISTVIEW, NULL,
-		WS_VISIBLE | WS_CHILD | WS_BORDER | LVS_REPORT | LVS_EDITLABELS | LVS_SINGLESEL,
+	ListView = CreateWindow(WC_LISTVIEW,
+		NULL,
+		WS_VISIBLE | WS_CHILD | WS_BORDER | LVS_REPORT | 
+		LVS_EDITLABELS | LVS_SINGLESEL,
 		WindowRT.left + 300, WindowRT.top + 110, WindowRT.right - 290, WindowRT.bottom - 120,
-		hWnd, (HMENU)ID_LISTVIEW, GetModuleHandle(NULL), NULL);
+		hWnd, 
+		(HMENU)ID_LISTVIEW, 
+		hInst,
+		NULL);
 
 	ListView_SetExtendedListViewStyleEx(ListView, 0, LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 	_set_listviw_colum();
@@ -71,14 +76,14 @@ void Objects::_create_tree()
 
 void Objects::_crete_objects()
 {
-	Edit = CreateWindow("edit", NULL, WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_READONLY | WS_BORDER,
+	Edit = CreateWindow("Edit", NULL, WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_READONLY | WS_BORDER,
 		0, 0, 0, 0, hWnd, (HMENU)ID_PATH_EDIT, hInst, NULL);
-	ComboBox = CreateWindow("combobox", NULL, WS_CHILD | WS_VISIBLE | CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | CB_SHOWDROPDOWN | WS_BORDER,
-		0, 0, 0, 0, hWnd, (HMENU)ID_DISKLIST_CB, NULL, NULL);
+	ComboBox = CreateWindow("Combobox", NULL, WS_CHILD | WS_VISIBLE | CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | CB_SHOWDROPDOWN | WS_BORDER,
+		0, 0, 0, 0, hWnd, (HMENU)ID_DISKLIST_CB, hInst, NULL);
 
-	Button[0] = CreateWindow("button", "<-", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_BORDER,
+	Button[0] = CreateWindow("Button", "<-", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_BORDER,
 		0, 0, 50, 25, hWnd, (HMENU)ID_BACK_BUTTON, hInst, NULL);
-	Button[1] = CreateWindow("button", "->", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_BORDER,
+	Button[1] = CreateWindow("Button", "->", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_BORDER,
 		50, 0, 50, 25, hWnd, (HMENU)ID_NEXT_BUTTON, hInst, NULL);
 }
 
@@ -109,10 +114,10 @@ void Objects::_set_listviw_colum()
 	LVCOLUMN lv;
 	lv.mask = LVCF_TEXT | LVCF_WIDTH;
 	lv.cx = (rt.right - rt.left) / number_colum; 
-	lv.cchTextMax = 1000;
+	lv.cchTextMax = 256;
 
 	for (int i = 0; i < number_colum; i++) {
-		lv.pszText = (LPSTR)str._set_and_get(Table_name + i);
+		lv.pszText = (LPSTR)str._get(Table_name + i);
 		index = ListView_InsertColumn(ListView, i, &lv);
 		if (index == -1) 
 			break;
@@ -135,4 +140,3 @@ Objects::~Objects()
 
 	delete[] Button;
 }
-

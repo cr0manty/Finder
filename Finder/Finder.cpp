@@ -7,15 +7,15 @@ Finder::Finder(HWND _hWnd) :
 {
 }
 
-Path Finder::_get_path() const
+Path & Finder::_get_path() const
 {
-	return path;
+	return *path;
 }
 
 void Finder::create_txt()
 {
-	SmartStringLoad str(DefaultTextFile);
-	std::string temp = same_name(path.main_path + str._get() + ".txt");
+	SmartStringLoad str;
+	std::string temp = same_name(path->main_path + str._get(DefaultTextFile) + ".txt");
 	try {
 		std::ofstream file(temp);
 		file.close();
@@ -24,16 +24,16 @@ void Finder::create_txt()
 	catch (...) {
 		return;
 	}
-	path.selected_file = temp;
+	path->selected_file = temp;
 	update_listview();
-	path.selected_index = path.item_amount - 1;
+	path->selected_index = path->item_amount - 1;
 	start_rename();
 }
 
 void Finder::create_folder()
 {
-	SmartStringLoad str(DefaultFolder);
-	std::string temp = same_name(path.main_path + str._get());
+	SmartStringLoad str;
+	std::string temp = same_name(path->main_path + str._get(DefaultFolder));
 
 	try {
 		boost::filesystem::create_directory(temp);
@@ -42,15 +42,15 @@ void Finder::create_folder()
 		return;
 	}
 
-	path.selected_file = temp;
+	path->selected_file = temp;
 	update_listview();
-	path.selected_index = path.item_amount - 1;
+	path->selected_index = path->item_amount - 1;
 	start_rename();
 }
 
 void Finder::start_rename()
 {
-	temp_edit = ListView_EditLabel(ListView, path.selected_index);
+	temp_edit = ListView_EditLabel(ListView, path->selected_index);
 }
 
 void Finder::end_rename()
@@ -59,16 +59,15 @@ void Finder::end_rename()
 		return;
 
 	char * temp = new char[256];
-	if (!GetWindowText(temp_edit, temp, 256)) {
-		SmartStringLoad str(ErrorEmptyName);
-		SmartStringLoad str_1(Error_info);
+	if (!GetWindowText(temp_edit, temp, 255)) {
+		SmartStringLoad str, str_1;
 
-		MessageBox(NULL, str._get(), str_1._get(), MB_OK);
+		MessageBox(NULL, str._get(ErrorEmptyName), str_1._get(Error_info), MB_OK);
 		goto error;
 	}
 
 	try {
-		boost::filesystem::rename(path.selected_file, path.main_path + temp);
+		boost::filesystem::rename(path->selected_file, path->main_path + temp);
 	}
 	catch (...) {
 		return;
@@ -76,7 +75,6 @@ void Finder::end_rename()
 	update_listview();
 error:
 	delete[] temp;
-
 }
 
 void Finder::open()
@@ -86,12 +84,12 @@ void Finder::open()
 
 	SmartFinder file;
 
-	if (file.find(path.selected_file)) {
+	if (file.find(path->selected_file)) {
 		if (file.is_file()) {
 			open_proc();
 		}
 		else {
-			path.main_path = path.selected_file + '\\';
+			path->main_path = path->selected_file + '\\';
 			update_listview();
 		}
 	}
@@ -111,21 +109,21 @@ void Finder::create_link()
 	{
 		int amount = 2, i;
 		IPersistFile  *ppf;
-		psl->SetPath(path.selected_file.c_str());
-		i = path.selected_file.rfind('.');
+		psl->SetPath(path->selected_file.c_str());
+		i = path->selected_file.rfind('.');
 
-		if (i > path.selected_file.size() - 5 && i != std::string::npos) {
-			path.selected_file.erase(i);
+		if (i > path->selected_file.size() - 5 && i != std::string::npos) {
+			path->selected_file.erase(i);
 		}
 
-		while (file.find(path.selected_file + type)) {
+		while (file.find(path->selected_file + type)) {
 				type = " (" + std::to_string(amount++) + ").lnk";
 		}
 
 		hres = psl->QueryInterface(IID_IPersistFile, (void**)&ppf);
 		if (SUCCEEDED(hres)) {
 			wchar_t  *wsz = new wchar_t[MAX_PATH];
-			MultiByteToWideChar(CP_ACP, 0, (path.selected_file + type).c_str(), -1, wsz, MAX_PATH);
+			MultiByteToWideChar(CP_ACP, 0, (path->selected_file + type).c_str(), -1, wsz, MAX_PATH);
 			hres = ppf->Save(wsz, true);
 			ppf->Release();
 			delete[] wsz;
@@ -138,37 +136,37 @@ void Finder::create_link()
 
 void Finder::show_back()
 {
-	if (path.main_path.size() <= 4)
+	if (path->main_path.size() <= 4)
 		return;
 
-	int index = path.main_path.size() - 3;
-	while (path.main_path[index--] != '\\');
-	path.next_path = path.main_path;
-	path.main_path.erase(index + 1);
-	path.main_path += '\\';
+	int index = path->main_path.size() - 3;
+	while (path->main_path[index--] != '\\');
+	path->next_path = path->main_path;
+	path->main_path.erase(index + 1);
+	path->main_path += '\\';
 	update_listview();
 }
 
 void Finder::show_next()
 {
-	if (path.next_path != path.main_path) {
-		path.main_path = path.next_path;
+	if (path->next_path != path->main_path) {
+		path->main_path = path->next_path;
 		update_listview();
 	}
 }
 
 void Finder::select_item()
 {
-	char *temp = new char[200];
+	char *temp = new char[128];
 	int index = ListView_GetNextItem(ListView,
 		-1, LVNI_ALL | LVNI_SELECTED);
-	ListView_GetItemText(ListView, index, 0, temp, 200);
+	ListView_GetItemText(ListView, index, 0, temp, 127);
 
 	if (index == -1)
 		goto end;
 
-	path.selected_index = index;
-	path.selected_file = path.main_path + temp;
+	path->selected_index = index;
+	path->selected_file = path->main_path + temp;
 end:
 	delete[] temp;
 }
@@ -183,7 +181,7 @@ void Finder::context_menu(LPARAM lParam)
 	if (!mouse_cmenu(point))
 		return;
 
-	char *temp = new char[200];
+	char *temp = new char[128];
 	_init_cmenu();
 	TrackPopupMenu(CMenu, TPM_RIGHTBUTTON |
 		TPM_TOPALIGN |
@@ -192,9 +190,9 @@ void Finder::context_menu(LPARAM lParam)
 
 	int index = ListView_GetNextItem(ListView,
 		-1, LVNI_ALL | LVNI_SELECTED);
-	ListView_GetItemText(ListView, index, 0, temp, 200);
+	ListView_GetItemText(ListView, index, 0, temp, 127);
 
-	path.selected_file = path.main_path + temp;
+	path->selected_file = path->main_path + temp;
 	delete[] temp;
 
 	DestroyMenu(CMenu);
@@ -206,7 +204,7 @@ void Finder::file_manip(bool _cut)
 		if (manip)
 			delete manip;
 
-		manip = new Manip(path.selected_file, path.main_path, _cut);
+		manip = new Manip(path->selected_file, path->main_path, _cut);
 	}
 }
 
@@ -224,7 +222,7 @@ void Finder::disk_change(WPARAM wParam)
 
 	char *temp = new char[6];
 	GetDlgItemText(hWnd, ID_DISKLIST_CB, temp, 5);
-	path.main_path = temp;
+	path->main_path = temp;
 	delete[] temp;
 
 	update_listview();
@@ -234,12 +232,11 @@ void Finder::delete_item()
 {
 	if (!path)
 		return;
-	SmartStringLoad str(DeleteFileInfo, 64);
-	SmartStringLoad str_1(DeleteFileHeader);
+	SmartStringLoad str, str_1;
 
-	if (MessageBox(NULL, str._get(),
-		str._get(), MB_ICONQUESTION | MB_YESNO) == IDYES) {
-		if (_delete(path.selected_file)) {
+	if (MessageBox(NULL, str._get(DeleteFileInfo, 64),
+		str_1._get(DeleteFileHeader), MB_ICONQUESTION | MB_YESNO) == IDYES) {
+		if (_delete(path->selected_file)) {
 			update_listview();
 		}
 	}
@@ -255,7 +252,7 @@ void Finder::make_paste()
 
 void Finder::show_info()
 {
-	DialogBoxParam(hInst, MAKEINTRESOURCE(ID_DLG_INFO), hWnd, (DLGPROC)DlgInfo, (LPARAM)this);
+	DialogBoxParam(GetModuleHandle(NULL), MAKEINTRESOURCE(ID_DLG_INFO), hWnd, (DLGPROC)DlgInfo, (LPARAM)this);
 }
 
 void Finder::make_refresh()
@@ -265,7 +262,7 @@ void Finder::make_refresh()
 
 void Finder::show_about()
 {
-	DialogBox(hInst, MAKEINTRESOURCE(ID_ABOUT), hWnd, (DLGPROC)DlgAbout);
+	DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(ID_ABOUT), hWnd, (DLGPROC)DlgAbout);
 }
 
 void Finder::tree_to_list()
@@ -275,20 +272,18 @@ void Finder::tree_to_list()
 	
 	HTREEITEM _selected = TreeView_GetSelection(Tree); 
 	TreeView_Expand(Tree, _selected, TVE_EXPAND);
+	path->selected_file = _get_full_path(_selected);
 
-	path.selected_file = _get_full_path(_selected);
-	SmartStringLoad str(MyComputer_info);
-	if (path.selected_file == str._get())
+	SmartStringLoad str;
+	if (path->selected_file == str._get(MyComputer_info))
 		return;
 
-	SmartFinder file(path.selected_file);
-
-	
+	SmartFinder file(path->selected_file);
 	if (!file.is_file()) {
 		if (!TreeView_GetChild(Tree, _selected)) {
-			path.selected_file += '\\';
+			path->selected_file += '\\';
 		}
-		path.main_path = path.selected_file;
+		path->main_path = path->selected_file;
 		update_listview();
 	}
 	else {
@@ -319,6 +314,7 @@ void Finder::tree_show(LPARAM lParam)
 	}
 }
 
+
 void Finder::minimize_window()
 {
 	ShowWindowAsync(hWnd, SW_MINIMIZE);
@@ -327,4 +323,8 @@ void Finder::minimize_window()
 void Finder::exit()
 {
 	PostQuitMessage(0);
+}
+
+Finder::~Finder()
+{
 }

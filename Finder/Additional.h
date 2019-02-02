@@ -8,41 +8,45 @@ public:
 	const int disk_amount;
 
 	Disk(int);
-	void add_disk(char*);
+
 	char* _get_disk(int) const;
+	void add_disk(char*);
+
 	~Disk();
 };
 
 class FileInfo
 {
-	WIN32_FIND_DATA file;
-	void create_time();
-	void change_time();
-	std::string temp;
 	bool is_file;
+	std::string temp;
+	WIN32_FIND_DATA file;
+
+	void change_time();
+	void create_time();
 public:
 	FileInfo(WIN32_FIND_DATA);
-	const char * _get_info(int);
+
 	const char * _get_header(int);
+	const char * _get_info(int);
 };
 
 struct Path 
 {
+	int selected_index;
+	int item_amount;
 	std::string main_path;
 	std::string next_path;
 	std::string	selected_file;
-	int selected_index;
-	int item_amount;
 
-	Path(const std::string &, const std::string &);
+	Path(const std::string &);
 	operator bool();
 };
 
 struct Manip 
 {
+	bool aDelete;
 	std::string file;
 	std::string path;
-	bool aDelete;
 
 	Manip(const std::string &, const std::string &, bool);
 	operator bool();

@@ -3,13 +3,10 @@
 class SmartStringLoad
 {
 	char * string;
+	HINSTANCE hInst;
 public:
 	SmartStringLoad();
-	SmartStringLoad(int);
-	SmartStringLoad(int, int);
-
-	char * _get() const;
-	char *_set_and_get(int, int = 32);
+	char *_get(int, int = 32);
 
 	~SmartStringLoad();
 };

@@ -8,6 +8,7 @@ class Objects
 	void _set_listviw_colum();
 	void _create_hotkey();
 
+	HINSTANCE hInst;
 	int buttons_amount;
 protected:
 	HWND ListView;

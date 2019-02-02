@@ -58,10 +58,6 @@ __int64 __stdcall WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			main->create_link();
 			break;
 
-		case ID_REFRESH_BTN:
-			main->make_refresh();
-			break;
-
 		case ID_PASTE_ITEM:
 			main->make_paste();
 			break;
@@ -165,6 +161,7 @@ __int64 __stdcall WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
+
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
@@ -173,9 +170,7 @@ __int64 __stdcall WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 bool __stdcall DlgInfo(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	HWND Object[6];
-	HWND Object_info[6];
-
+	HWND *Object, *Object_info;
 	SmartFinder file;
 	Finder *main;
 	SmartStringLoad str;
@@ -184,7 +179,7 @@ bool __stdcall DlgInfo(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 	switch (msg)
 	{
 	case WM_INITDIALOG:
-		SetWindowText(hDlg, str._set_and_get(DialogAboutName));
+		SetWindowText(hDlg, str._get(DialogAboutName));
 
 		main = (Finder*)lParam;
 		if (file.find(main->_get_path().selected_file) && main->_get_path().selected_file.size() > 3) {
@@ -194,30 +189,23 @@ bool __stdcall DlgInfo(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 			EndDialog(hDlg, LOWORD(wParam));
 			return false;
 		}
-
-		Object[0] = GetDlgItem(hDlg, IDC_STATIC1);
-		Object[2] = GetDlgItem(hDlg, IDC_STATIC2);
-		Object[3] = GetDlgItem(hDlg, IDC_STATIC3);
-		Object[4] = GetDlgItem(hDlg, IDC_STATIC4);
-		Object[1] = GetDlgItem(hDlg, IDC_STATIC5);
-		Object[5] = GetDlgItem(hDlg, IDC_EDIT2);
-
-		Object_info[5] = GetDlgItem(hDlg, IDC_STATIC_STATIC1);
-		Object_info[0] = GetDlgItem(hDlg, IDC_STATIC_STATIC2);
-		Object_info[2] = GetDlgItem(hDlg, IDC_STATIC_STATIC3);
-		Object_info[3] = GetDlgItem(hDlg, IDC_STATIC_STATIC4);
-		Object_info[4] = GetDlgItem(hDlg, IDC_STATIC_STATIC5);
-		Object_info[1] = GetDlgItem(hDlg, IDC_STATIC_STATIC6);
-
+		Object = new HWND[6];
+		Object_info = new HWND[6];
 
 		for (int i = 0; i < 5 ; i++) {
+			Object[i] = GetDlgItem(hDlg, ID_NOBJECT_1 + i);
+			Object_info[i] = GetDlgItem(hDlg, ID_OBJECT_1 + i);
 			SendMessage(Object[i], WM_SETTEXT, (WPARAM)255, (LPARAM)info->_get_info(i));
 			SendMessage(Object_info[i], WM_SETTEXT, (WPARAM)255, (LPARAM)info->_get_header(i));
 		}
-
+		Object[5] = GetDlgItem(hDlg, ID_NOBJECT_6);
+		Object_info[5] = GetDlgItem(hDlg, ID_OBJECT_6);
 		SendMessage(Object[5], WM_SETTEXT, (WPARAM)255, (LPARAM)main->_get_path().main_path.c_str());
 		SendMessage(Object_info[5], WM_SETTEXT, (WPARAM)255, (LPARAM)info->_get_header(5));
+
 		delete info;
+		delete[] Object;
+		delete[] Object_info;
 		return true;
 
 	case WM_COMMAND:
@@ -237,8 +225,8 @@ bool __stdcall DlgAbout(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 	switch (msg)
 	{
 	case WM_INITDIALOG:
-		SetWindowText(hDlg, str._set_and_get(DialogAboutName));
-		SendMessage(GetDlgItem(hDlg, ID_ABOUT_STATIC), WM_SETTEXT, (WPARAM)1024, (LPARAM)str._set_and_get(Copyright, 1024));
+		SetWindowText(hDlg, str._get(DialogAboutName));
+		SendMessage(GetDlgItem(hDlg, ID_ABOUT_STATIC), WM_SETTEXT, (WPARAM)1024, (LPARAM)str._get(Copyright, 1024));
 		return true;
 		
 	case WM_COMMAND:
@@ -250,50 +238,3 @@ bool __stdcall DlgAbout(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 	return false;
 }
-
-unsigned short MyRegisterClass(HINSTANCE hInstance)
-{
-	WNDCLASSEX wcex;
-	wcex.cbSize = sizeof(WNDCLASSEX);
-	wcex.style = CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc = (WNDPROC)WndProc;
-	wcex.cbClsExtra = 0;
-	wcex.cbWndExtra = 0;
-	wcex.hInstance = hInstance;
-	wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(ID_FINDER_ICON));
-	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground = CreateSolidBrush(RGB(240, 240, 240));
-	wcex.lpszMenuName = NULL;
-	wcex.lpszClassName = wnd_class;
-	wcex.hIconSm = NULL;
-
-	return RegisterClassEx(&wcex);
-}
-
-BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
-{
-	HWND hWnd;
-	SmartStringLoad str(window_name);
-	hInst = hInstance;
-
-	hWnd = CreateWindow(wnd_class,
-		str._get(),
-		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		NULL,
-		NULL,
-		hInstance,
-		NULL);
-
-	if (!hWnd)
-		return false;
-
-	ShowWindow(hWnd, nCmdShow);
-	UpdateWindow(hWnd);
-
-	return true;
-}
-

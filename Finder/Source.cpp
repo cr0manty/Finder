@@ -1,20 +1,15 @@
-#include "Finder.h"
+#include "Window.h"
 
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmdLine,
 	int nCmdShow)
 {
-	MSG msg;
+	Window wnd(hInstance);
+	wnd.init_window(nCmdShow);
 
-	MyRegisterClass(hInstance);
-	
-	if (!InitInstance(hInstance, nCmdShow))
-		return FALSE;
-	
-
-	while (GetMessage(&msg, NULL, 0, 0)) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+	while (GetMessage(&wnd.msg, NULL, 0, 0)) {
+			TranslateMessage(&wnd.msg);
+			DispatchMessage(&wnd.msg);
 	}
 
-	return msg.wParam;
+	return wnd.msg.wParam;
 }
