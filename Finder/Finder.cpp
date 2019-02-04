@@ -20,7 +20,6 @@ void Finder::create_txt()
 		std::ofstream file(temp);
 		file.close();
 	}
-
 	catch (...) {
 		return;
 	}
@@ -61,19 +60,17 @@ void Finder::end_rename()
 	char * temp = new char[256];
 	if (!GetWindowText(temp_edit, temp, 255)) {
 		SmartStringLoad str, str_1;
-
 		MessageBox(NULL, str._get(ErrorEmptyName), str_1._get(Error_info), MB_OK);
-		goto error;
+		goto end;
 	}
-
 	try {
 		boost::filesystem::rename(path->selected_file, path->main_path + temp);
 	}
 	catch (...) {
-		return;
+		goto end;
 	}
 	update_listview();
-error:
+end:
 	delete[] temp;
 }
 
@@ -297,9 +294,7 @@ void Finder::tree_show(LPARAM lParam)
 		return;
 
 	HTREEITEM myComputer = TreeView_GetRoot(Tree);
-	NMHDR* notifyMess = (NMHDR*)lParam;
-	LPNMTREEVIEW _tree = (LPNMTREEVIEW)notifyMess; 
-	HTREEITEM _selected = _tree->itemNew.hItem;
+	HTREEITEM _selected = LPNMTREEVIEW((NMHDR*)lParam)->itemNew.hItem;
 
 	if (_selected == myComputer) 
 		return;

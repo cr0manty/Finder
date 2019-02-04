@@ -167,18 +167,14 @@ std::string Functional::_getPath(HTREEITEM _item, char* temp)
 
 std::string Functional::_get_full_path(HTREEITEM _selected)
 {
-	char *temp = new char[64];
-	_getPath(_selected, temp);
-	std::string temp_path = temp;
-	delete[] temp;
-
-	HTREEITEM _selected_child = TreeView_GetParent(Tree, _selected);
+	char *temp;
+	std::string temp_path;
 	HTREEITEM root = TreeView_GetRoot(Tree);
 
-	while (_selected_child != root && _selected_child) {
+	while (_selected != root && _selected) {
 		temp = new char[64];
-		temp_path.insert(0, _getPath(_selected_child, temp) + "\\");
-		_selected_child = TreeView_GetParent(Tree, _selected_child);
+		temp_path.insert(0, (_getPath(_selected, temp) + '\\'));
+		_selected = TreeView_GetParent(Tree, _selected);
 		delete[] temp;
 	}
 	return temp_path;
@@ -224,18 +220,22 @@ bool Functional::try_paste()
 		temp = same_name(manip->file);
 	}
 
-	SmartFinder check_file(manip->file);
 	try {
+		SmartFinder check_file;
+		temp = path->main_path + temp.substr(temp.rfind('\\', temp.size() - 1));
+		if (check_file.find(temp)) {
+			throw "File exist!";
+		}
+		check_file.find(manip->file);
 		if (check_file.is_file()) {
-			boost::filesystem::copy_file(manip->file, path->main_path + temp.substr(temp.rfind('\\', temp.size() - 1)), boost::filesystem::copy_option::fail_if_exists);
+			boost::filesystem::copy_file(manip->file, temp);
 		}
 		else {
-			boost::filesystem::copy_directory(manip->file, path->main_path + temp.substr(temp.rfind('\\', temp.size() - 1)));
+			boost::filesystem::copy_directory(manip->file, temp);
 		}
 	}
 	catch (...) {
 		SmartStringLoad str, str_1;
-
 		MessageBox(NULL, str._get(ErrorPaste), str_1._get(Error_info), MB_OK);
 		return false;
 	}
@@ -288,6 +288,7 @@ void Functional::tree_load(HTREEITEM _item, const std::string &_path)
 
 Functional::~Functional()
 {
+	delete path;
 	delete disks;
 	if (manip)
 		delete manip;
