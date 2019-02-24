@@ -8,158 +8,31 @@ __int64 __stdcall WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_CREATE:
 		main = new Finder(hWnd);
-		break;
-	
+		return true;
+
 	case WM_NOTIFY:
-		switch (LPNMHDR(lParam)->code)
-		{
-		case NM_DBLCLK:
-			main->open();
-			break;
-
-		case NM_CLICK:
-			main->select_item();
-			break;
-
-		case LVN_ENDLABELEDIT:
-			main->end_rename();
-			break;
-
-		case TVN_SELCHANGED:
-			main->tree_to_list();
-			break;
-
-		case TVN_ITEMEXPANDED: 
-			main->tree_show(lParam);
-			break;
-		}
-		break;
+		return main->notify_switch(lParam);
 
 	case WM_CONTEXTMENU:
-		main->context_menu(lParam);
-		break;
+		return main->context_menu(lParam);
 
 	case WM_COMMAND:
-		switch (LOWORD(wParam))
-		{
-		case ID_COPY_ITEM:
-			main->file_manip(Copy);
-			break;
-
-		case ID_CUT_ITEM:
-			main->file_manip(Paste);
-			break;
-
-		case ID_OPEN_ITEM:
-			main->open();
-			break;
-
-		case ID_LINK_ITEM:
-			main->create_link();
-			break;
-
-		case ID_PASTE_ITEM:
-			main->make_paste();
-			break;
-
-		case ID_RENAME_ITEM:
-			main->start_rename();
-			break;
-
-		case ID_CREATE_FOLDER:
-			main->create_folder();
-			break;
-
-		case ID_CREATE_TEXT_ITEM:
-			main->create_txt();
-			break;
-
-		case ID_INFO_ITEM:
-			main->show_info();
-			break;
-
-		case ID_DELETE_ITEM:
-			main->delete_item();
-			break;
-
-		case ID_BACK_BUTTON:
-			main->show_back();
-			break;
-
-		case ID_NEXT_BUTTON:
-			main->show_next();
-			break;
-
-		case ID_DISKLIST_CB:
-			main->disk_change(wParam);
-			break;
-
-		case ID_PROGRAM_ABOUT:
-			main->show_about();
-			break;
-
-		case ID_PROGRAM_CLOSE:
-			main->exit();
-			break;
-		}
-		break;
+		return main->command_switch(wParam);
 
 	case WM_HOTKEY:
-		switch (wParam)
-		{
-		case ID_DELETE_HK:
-			main->delete_item();
-			break;
+		return main->hotkey_switch(wParam);
 
-		case ID_COPY_HK:
-			main->file_manip(Copy);
-			break;
-
-		case ID_CUT_HK:
-			main->file_manip(Paste);
-			break;
-
-		case ID_PASTE_HK:
-			main->make_paste();
-			break;
-
-		case ID_REFRESH_HK:
-			main->make_refresh();
-			break;
-
-		case ID_MINIM_HK:
-			main->minimize_window();
-			break;
-
-		case ID_BACK_HK:
-			main->show_back();
-			break;
-
-		case ID_NEXT_HK:
-			main->show_next();
-			break;
-
-		case ID_CREATE_FOLDER:
-			main->create_folder();
-			break;
-
-		case ID_CREATE_TEXT_ITEM:
-			main->create_txt();
-			break;
-
-		}
-		break;
+	case WM_KEYDOWN:
+		return main->key_down_switch(wParam);
 
 	case WM_GETMINMAXINFO:
-		main->fix_size(lParam);
-		break;
+		return main->fix_size(lParam);
 
 	case WM_SIZE:
-		main->resize();
-		break;
+		return main->resize();
 
 	case WM_DESTROY:
-		PostQuitMessage(0);
+		delete main;
 		break;
 
 	default:
@@ -170,42 +43,13 @@ __int64 __stdcall WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 bool __stdcall DlgInfo(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	HWND *Object, *Object_info;
-	SmartFinder file;
 	Finder *main;
-	SmartStringLoad str;
-	FileInfo *info;
 
 	switch (msg)
 	{
 	case WM_INITDIALOG:
-		SetWindowText(hDlg, str._get(DialogAboutName));
-
 		main = (Finder*)lParam;
-		if (file.find(main->_get_path().selected_file) && main->_get_path().selected_file.size() > 3) {
-			info = new FileInfo(file._get());
-		}
-		else {
-			EndDialog(hDlg, LOWORD(wParam));
-			return false;
-		}
-		Object = new HWND[6];
-		Object_info = new HWND[6];
-
-		for (int i = 0; i < 5 ; i++) {
-			Object[i] = GetDlgItem(hDlg, ID_NOBJECT_1 + i);
-			Object_info[i] = GetDlgItem(hDlg, ID_OBJECT_1 + i);
-			SendMessage(Object[i], WM_SETTEXT, (WPARAM)255, (LPARAM)info->_get_info(i));
-			SendMessage(Object_info[i], WM_SETTEXT, (WPARAM)255, (LPARAM)info->_get_header(i));
-		}
-		Object[5] = GetDlgItem(hDlg, ID_NOBJECT_6);
-		Object_info[5] = GetDlgItem(hDlg, ID_OBJECT_6);
-		SendMessage(Object[5], WM_SETTEXT, (WPARAM)255, (LPARAM)main->_get_path().main_path.c_str());
-		SendMessage(Object_info[5], WM_SETTEXT, (WPARAM)255, (LPARAM)info->_get_header(5));
-
-		delete info;
-		delete[] Object;
-		delete[] Object_info;
+		main->dlgInfo_proc(hDlg, wParam);
 		return true;
 
 	case WM_COMMAND:

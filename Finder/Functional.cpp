@@ -55,7 +55,7 @@ void Functional::_init_tree()
 	_insert.item.mask = TVIF_TEXT | TVIF_PARAM;
 	_insert.hParent = NULL;
 	_insert.hInsertAfter = TVI_LAST;
-	_insert.item.pszText = (char*)str._get(MyComputer_info);
+	_insert.item.pszText = str._get(MyComputer_info);
 
 	HTREEITEM MyComputer = TreeView_InsertItem(Tree, &_insert);
 	HTREEITEM Disk;
@@ -124,12 +124,12 @@ bool Functional::_add_lw_item(WIN32_FIND_DATA _file)
 	lvi.mask = LVIF_TEXT;
 	lvi.cchTextMax = 1000;
 	lvi.iItem = iLastIndex;
-	lvi.pszText = (LPSTR)info->_get_info(0);
+	lvi.pszText = info->_get_info(0);
 	lvi.iSubItem = 0;
 	ListView_InsertItem(ListView, &lvi);
 
 	for (int i = 1; i < number_colum; i++) {
-		ListView_SetItemText(ListView, iLastIndex, i, (char*)info->_get_info(i));
+		ListView_SetItemText(ListView, iLastIndex, i, info->_get_info(i));
 	}
 	delete info;
 	return true;
@@ -152,17 +152,17 @@ bool Functional::open_proc()
 		return true;
 }
 
-std::string Functional::_getPath(HTREEITEM _item, char* temp)
+std::string Functional::_getPath(HTREEITEM _item, char * _temp)
 {
 	TV_ITEM tv;
 
 	tv.mask = TVIF_TEXT | TVIF_HANDLE;
 	tv.hItem = _item;
-	tv.pszText = temp;
+	tv.pszText = _temp;
 	tv.cchTextMax = 63;
 	TreeView_GetItem(Tree, &tv);
 
-	return (char*)tv.pszText;
+	return tv.pszText;
 }
 
 std::string Functional::_get_full_path(HTREEITEM _selected)
@@ -258,7 +258,7 @@ void Functional::update_listview()
 
 	if (file.find(path->main_path + "*")) {
 		do {
-			if (file.hidden()) {
+			if (file.is_nHidden()) {
 				_add_lw_item(file._get());
 			}
 		} while (file.next());
@@ -279,7 +279,7 @@ void Functional::tree_load(HTREEITEM _item, const std::string &_path)
 	_insert.item.mask = TVIF_TEXT;
 
 	do {
-		if (!file.is_file() && file.hidden()) {
+		if (!file.is_file() && file.is_nHidden()) {
 			_insert.item.pszText = file._get().cFileName;
 			TreeView_InsertItem(Tree, &_insert);
 		}
@@ -292,4 +292,5 @@ Functional::~Functional()
 	delete disks;
 	if (manip)
 		delete manip;
+
 }

@@ -1,9 +1,9 @@
 #include "includes.h"
 
-bool Objects::mouse_cmenu(const POINT &_p)
+bool Objects::mouse_cmenu(const POINT &_point)
 {
-	return _p.x < LVrt.right && _p.x > LVrt.left &&
-		_p.y < LVrt.bottom && _p.y > LVrt.top;
+	return _point.x < LVrt.right && _point.x > LVrt.left &&
+		_point.y < LVrt.bottom && _point.y > LVrt.top;
 }
 
 Objects::Objects(HWND _hWnd, int _size) :
@@ -17,10 +17,10 @@ Objects::Objects(HWND _hWnd, int _size) :
 	resize();
 }
 
-void Objects::resize()
+bool Objects::resize()
 {
 	if (!this)
-		return;
+		return false;
 
 	HWND temp = NULL;
 	GetClientRect(hWnd, &WindowRT);
@@ -30,6 +30,7 @@ void Objects::resize()
 	SetWindowPos(Tree, temp, WindowRT.left, WindowRT.top + 25, WindowRT.left + 300, WindowRT.bottom, NULL);
 	SetWindowPos(Edit, temp, WindowRT.left + 300, WindowRT.top, WindowRT.right - 355, 25, NULL);
 	SetWindowPos(ComboBox, temp, WindowRT.right - 55, WindowRT.top, 55, 200, NULL);
+	return true;
 }
 
 void Objects::_create_listview()
@@ -89,9 +90,6 @@ void Objects::_crete_objects()
 
 void Objects::_create_hotkey()
 {
-	RegisterHotKey(hWnd, ID_DELETE_HK, NULL, VK_DELETE);
-	RegisterHotKey(hWnd, ID_REFRESH_HK, NULL, VK_F5);
-
 	RegisterHotKey(hWnd, ID_COPY_HK, MOD_CONTROL, 0x43);
 	RegisterHotKey(hWnd, ID_CUT_HK, MOD_CONTROL, 0x58);
 	RegisterHotKey(hWnd, ID_PASTE_HK, MOD_CONTROL, 0x56);
@@ -128,15 +126,6 @@ Objects::~Objects()
 {
 	DestroyMenu(CMenu);
 	DestroyMenu(Main_Menu);
-
-	DestroyWindow(Edit);
-	DestroyWindow(Tree);
-	DestroyWindow(ListView);
-	DestroyWindow(ComboBox);
-	DestroyWindow(hWnd);
-
-	for (int i = 0; i < buttons_amount; i++)
-		DestroyWindow(Button[i]);
 
 	delete[] Button;
 }

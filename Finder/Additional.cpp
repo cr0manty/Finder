@@ -103,9 +103,9 @@ FileInfo::FileInfo(WIN32_FIND_DATA _file) :
 	is_file = file.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE;
 }
 
-const char * FileInfo::_get_info(int _switch)
+char * FileInfo::_get_info(int _switch)
 {
-	SmartStringLoad str;
+	SmartStringLoad *str = new SmartStringLoad();
 
 	switch(_switch)
 	{
@@ -122,30 +122,31 @@ const char * FileInfo::_get_info(int _switch)
 			temp = temp.substr(temp.rfind('.') + 1, temp.size() - 1).c_str();
 		}
 		else {
-			temp = str._get(Folder_info);
+			temp = str->_get(Folder_info);
 		}
 		break;
 
 	case 3:
 		if (is_file) {
 			temp = std::to_string((file.nFileSizeHigh * MAXDWORD) + file.nFileSizeLow) + " สม";
-			break;
 		}
 		else {
-			return " ";
+			temp = " ";
 		}
+		break;
 
 	case 4:
 		create_time();
 		break;
 
 	default:
-		return " ";
+		temp = " ";
 	}
-	return temp.c_str();
+	delete str;
+	return const_cast<char *>(temp.c_str());
 }
 
-const char * FileInfo::_get_header(int _switch)
+char * FileInfo::_get_header(int _switch)
 {
 	SmartStringLoad str;
 	
@@ -176,7 +177,7 @@ const char * FileInfo::_get_header(int _switch)
 		break;
 
 	default:
-		return " ";
+		temp = " ";
 	}
-	return temp.c_str();
+	return const_cast<char*>(temp.c_str());
 }

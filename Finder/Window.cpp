@@ -42,8 +42,3 @@ void Window::init_window(int _cmd)
 	ShowWindow(hWnd, _cmd);
 	UpdateWindow(hWnd);
 }
-
-Window::~Window()
-{
-}
-

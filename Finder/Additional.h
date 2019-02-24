@@ -26,8 +26,8 @@ class FileInfo
 public:
 	FileInfo(WIN32_FIND_DATA);
 
-	const char * _get_header(int);
-	const char * _get_info(int);
+	char * _get_header(int);
+	char * _get_info(int);
 };
 
 struct Path 

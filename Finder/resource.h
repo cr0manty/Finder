@@ -82,7 +82,6 @@
 #define ID_PROGRAM_ABOUT                40004
 #define ID_PROGRAM_CLOSE                40005
 #define ID_LANGUAGE                     40006
-#define ID_DELETE_HK                    40007
 #define ID_COPY_HK                      40008
 #define ID_CUT_HK                       40009
 #define ID_PASTE_HK                     40010

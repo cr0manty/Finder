@@ -27,5 +27,5 @@ protected:
 	Objects(HWND, int);
 	~Objects();
 public:
-	void resize();
+	bool resize();
 };

@@ -8,6 +8,5 @@ public:
 	MSG msg;
 	Window(HINSTANCE);
 	void init_window(int);
-	~Window();
 };
 

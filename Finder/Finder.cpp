@@ -7,11 +7,6 @@ Finder::Finder(HWND _hWnd) :
 {
 }
 
-Path & Finder::_get_path() const
-{
-	return *path;
-}
-
 void Finder::create_txt()
 {
 	SmartStringLoad str;
@@ -168,7 +163,7 @@ end:
 	delete[] temp;
 }
 
-void Finder::context_menu(LPARAM lParam)
+bool Finder::context_menu(__int64 _cmd)
 {
 	select_item();
 	POINT point;
@@ -176,14 +171,14 @@ void Finder::context_menu(LPARAM lParam)
 	ScreenToClient(hWnd, &point);
 
 	if (!mouse_cmenu(point))
-		return;
+		return false;
 
 	char *temp = new char[128];
 	_init_cmenu();
 	TrackPopupMenu(CMenu, TPM_RIGHTBUTTON |
 		TPM_TOPALIGN |
 		TPM_LEFTALIGN,
-		LOWORD(lParam), HIWORD(lParam), 0, hWnd, NULL);
+		LOWORD(_cmd), HIWORD(_cmd), 0, hWnd, NULL);
 
 	int index = ListView_GetNextItem(ListView,
 		-1, LVNI_ALL | LVNI_SELECTED);
@@ -193,6 +188,7 @@ void Finder::context_menu(LPARAM lParam)
 	delete[] temp;
 
 	DestroyMenu(CMenu);
+	return true;
 }
 
 void Finder::file_manip(bool _cut)
@@ -200,21 +196,22 @@ void Finder::file_manip(bool _cut)
 	if (path) {
 		if (manip)
 			delete manip;
-
 		manip = new Manip(path->selected_file, path->main_path, _cut);
 	}
 }
 
-void Finder::fix_size(LPARAM lParam)
+bool Finder::fix_size(__int64 _cmd)
 {
-	LPMINMAXINFO lpMMI = (LPMINMAXINFO)lParam;
+	LPMINMAXINFO lpMMI = (LPMINMAXINFO)_cmd;
 	lpMMI->ptMinTrackSize.x = 500;
 	lpMMI->ptMinTrackSize.y = 200;
+
+	return true;
 }
 
-void Finder::disk_change(WPARAM wParam)
+void Finder::disk_change(__int64 _cmd)
 {
-	if (HIWORD(wParam) != CBN_SELENDOK)
+	if (HIWORD(_cmd) != CBN_SELENDOK)
 		return;
 
 	char *temp = new char[6];
@@ -288,13 +285,13 @@ void Finder::tree_to_list()
 	}
 }
 
-void Finder::tree_show(LPARAM lParam)
+void Finder::tree_show(__int64 _cmd)
 {
 	if (!this)
 		return;
 
 	HTREEITEM myComputer = TreeView_GetRoot(Tree);
-	HTREEITEM _selected = LPNMTREEVIEW((NMHDR*)lParam)->itemNew.hItem;
+	HTREEITEM _selected = LPNMTREEVIEW((NMHDR*)_cmd)->itemNew.hItem;
 
 	if (_selected == myComputer) 
 		return;
@@ -309,17 +306,198 @@ void Finder::tree_show(LPARAM lParam)
 	}
 }
 
+bool Finder::command_switch(__int64 _cmd)
+{
+	switch (_cmd)
+	{
+	case ID_COPY_ITEM:
+		file_manip(Copy);
+		return true;
+
+	case ID_CUT_ITEM:
+		file_manip(Paste);
+		return true;
+
+	case ID_OPEN_ITEM:
+		open();
+		return true;
+
+	case ID_LINK_ITEM:
+		create_link();
+		return true;
+
+	case ID_PASTE_ITEM:
+		make_paste();
+		return true;
+
+	case ID_RENAME_ITEM:
+		start_rename();
+		return true;
+
+	case ID_CREATE_FOLDER:
+		create_folder();
+		return true;
+
+	case ID_CREATE_TEXT_ITEM:
+		create_txt();
+		return true;
+
+	case ID_INFO_ITEM:
+		show_info();
+		return true;
+
+	case ID_DELETE_ITEM:
+		delete_item();
+		return true;
+
+	case ID_BACK_BUTTON:
+		show_back();
+		return true;
+
+	case ID_NEXT_BUTTON:
+		show_next();
+		return true;
+
+	case ID_DISKLIST_CB:
+		disk_change(_cmd);
+		return true;
+
+	case ID_PROGRAM_ABOUT:
+		show_about();
+		return true;
+
+	case ID_PROGRAM_CLOSE:
+		PostQuitMessage(0);
+		return true;
+	}
+	return false;
+}
+
+bool Finder::hotkey_switch(__int64 _cmd)
+{
+	switch (_cmd)
+	{
+	case ID_REFRESH_HK:
+		make_refresh();
+		return true;
+
+	case ID_COPY_HK:
+		file_manip(Copy);
+		return true;
+
+	case ID_CUT_HK:
+		file_manip(Paste);
+		return true;
+
+	case ID_PASTE_HK:
+		make_paste();
+		return true;
+
+	case ID_MINIM_HK:
+		minimize_window();
+		return true;
+
+	case ID_BACK_HK:
+		show_back();
+		return true;
+
+	case ID_NEXT_HK:
+		show_next();
+		return true;
+
+	case ID_CREATE_FOLDER:
+		create_folder();
+		return true;
+
+	case ID_CREATE_TEXT_ITEM:
+		create_txt();
+		return true;
+	}
+	return false;
+}
+
+bool Finder::notify_switch(__int64 _cmd)
+{
+	switch (LPNMHDR(_cmd)->code)
+	{
+	case NM_DBLCLK:
+		open();
+		return true;
+
+	case NM_CLICK:
+		select_item();
+		return true;
+
+	case LVN_ENDLABELEDIT:
+		end_rename();
+		return true;
+
+	case TVN_SELCHANGED:
+		tree_to_list();
+		return true;
+
+	case TVN_ITEMEXPANDED:
+		tree_show(_cmd);
+		return true;
+	}
+	return false;
+}
+
+bool Finder::key_down_switch(__int64 _cmd)
+{
+	switch (_cmd)
+	{
+	case VK_DELETE:
+		delete_item();
+		return true;
+
+	case VK_F5:
+		make_refresh();
+		return true;
+	}
+	return false;
+}
+
+bool Finder::dlgInfo_proc(HWND _hDlg, __int64 wParam)
+{
+	HWND *Object, *Object_info;
+	SmartFinder file;
+	SmartStringLoad str;
+	SetWindowText(_hDlg, str._get(DialogAboutName));
+
+	if (file.find(path->selected_file) && path->selected_file.size() > 3) {
+		info = new FileInfo(file._get());
+	}
+	else {
+		EndDialog(_hDlg, LOWORD(wParam));
+		return false;
+	}
+	Object = new HWND[6];
+	Object_info = new HWND[6];
+
+	for (int i = 0; i < 5; i++) {
+		Object[i] = GetDlgItem(_hDlg, ID_NOBJECT_1 + i);
+		Object_info[i] = GetDlgItem(_hDlg, ID_OBJECT_1 + i);
+		SendMessage(Object[i], WM_SETTEXT, (WPARAM)255, (LPARAM)info->_get_info(i));
+		SendMessage(Object_info[i], WM_SETTEXT, (WPARAM)255, (LPARAM)info->_get_header(i));
+	}
+	Object[5] = GetDlgItem(_hDlg, ID_NOBJECT_6);
+	Object_info[5] = GetDlgItem(_hDlg, ID_OBJECT_6);
+	SendMessage(Object[5], WM_SETTEXT, (WPARAM)255, (LPARAM)path->main_path.c_str());
+	SendMessage(Object_info[5], WM_SETTEXT, (WPARAM)255, (LPARAM)info->_get_header(5));
+
+	delete info;
+	delete[] Object;
+	delete[] Object_info;
+	return false;
+}
 
 void Finder::minimize_window()
 {
 	ShowWindowAsync(hWnd, SW_MINIMIZE);
 }
 
-void Finder::exit()
-{
-	PostQuitMessage(0);
-}
-
 Finder::~Finder()
 {
+	PostQuitMessage(0);
 }
