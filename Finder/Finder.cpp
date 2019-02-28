@@ -234,12 +234,12 @@ void Finder::make_paste()
 
 void Finder::show_info()
 {
-	DialogBoxParam(hInst, MAKEINTRESOURCE(ID_DLG_INFO), hWnd, (DLGPROC)DlgInfo, (LPARAM)this);
+	DialogBoxParam(hInst, MAKEINTRESOURCE(ID_DLG_INFO), hWnd, reinterpret_cast<DLGPROC>(DlgInfo), reinterpret_cast<unsigned __int64>(this));
 }
 
 void Finder::show_about()
 {
-	DialogBox(hInst, MAKEINTRESOURCE(ID_ABOUT), hWnd, (DLGPROC)DlgAbout);
+	DialogBox(hInst, MAKEINTRESOURCE(ID_ABOUT), hWnd, reinterpret_cast<DLGPROC>(DlgAbout));
 }
 
 void Finder::tree_to_list()
