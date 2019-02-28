@@ -8,7 +8,7 @@ Window::Window(HINSTANCE _hInst) :
 
 	wcex.cbSize = sizeof(WNDCLASSEX);
 	wcex.style = CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc = (WNDPROC)WndProc;
+	wcex.lpfnWndProc = reinterpret_cast<WNDPROC>(MainFunc);
 	wcex.cbClsExtra = 0;
 	wcex.cbWndExtra = 0;
 	wcex.hInstance = hInst;
@@ -24,7 +24,6 @@ Window::Window(HINSTANCE _hInst) :
 
 void Window::init_window(int _cmd)
 {
-	HWND hWnd;
 	SmartStringLoad str, str_1;
 
 	hWnd = CreateWindow(str._get(WND_class),

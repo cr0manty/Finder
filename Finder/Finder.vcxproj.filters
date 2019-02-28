@@ -78,7 +78,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="finder.ico">
+    <Image Include="Finder.ico">
       <Filter>Файлы ресурсов</Filter>
     </Image>
   </ItemGroup>

@@ -6,9 +6,8 @@ class Objects
 	void _create_tree();
 	void _crete_objects();
 	void _set_listviw_colum();
-	void _create_hotkey();
+	void create_hotkey();
 
-	HINSTANCE hInst;
 	int buttons_amount;
 protected:
 	HWND ListView;
@@ -19,6 +18,7 @@ protected:
 	HMENU CMenu;
 	HMENU Main_Menu;
 	HWND hWnd;
+	HINSTANCE hInst;
 	const int number_colum;
 	RECT LVrt;
 	RECT WindowRT;
@@ -28,4 +28,5 @@ protected:
 	~Objects();
 public:
 	bool resize();
+	bool minimize() const;
 };

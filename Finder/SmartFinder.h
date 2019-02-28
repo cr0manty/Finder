@@ -12,7 +12,7 @@ public:
 	bool find(const std::string &);
 	bool next();
 	bool is_file() const;
-	bool is_nHidden() const;
+	bool not_hidden() const;
 
 	WIN32_FIND_DATA _get() const;
 	~SmartFinder();

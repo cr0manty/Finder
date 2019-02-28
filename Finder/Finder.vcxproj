@@ -149,7 +149,7 @@
     <ResourceCompile Include="Finder.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="finder.ico" />
+    <Image Include="Finder.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

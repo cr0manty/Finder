@@ -9,7 +9,7 @@ public:
 
 	Disk(int);
 
-	char* _get_disk(int) const;
+	char * _get_disk(int) const;
 	void add_disk(char*);
 
 	~Disk();

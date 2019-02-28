@@ -105,7 +105,7 @@ FileInfo::FileInfo(WIN32_FIND_DATA _file) :
 
 char * FileInfo::_get_info(int _switch)
 {
-	SmartStringLoad *str = new SmartStringLoad();
+	SmartStringLoad str;
 
 	switch(_switch)
 	{
@@ -122,7 +122,7 @@ char * FileInfo::_get_info(int _switch)
 			temp = temp.substr(temp.rfind('.') + 1, temp.size() - 1).c_str();
 		}
 		else {
-			temp = str->_get(Folder_info);
+			temp = str._get(Folder_info);
 		}
 		break;
 
@@ -142,7 +142,6 @@ char * FileInfo::_get_info(int _switch)
 	default:
 		temp = " ";
 	}
-	delete str;
 	return const_cast<char *>(temp.c_str());
 }
 

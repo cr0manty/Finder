@@ -2,7 +2,7 @@
 // Включаемый файл, созданный в Microsoft Visual C++.
 // Используется Finder.rc
 //
-#define WND_class						0x00001
+#define WND_class                       0x00001
 #define ID_BACK_BUTTON                  0x00003
 #define ID_NEXT_BUTTON                  0x00004
 #define ID_PATH_EDIT                    0x00005
@@ -14,7 +14,6 @@
 #define ID_LISTVIEW                     0x00011
 #define ID_TREEVIEW                     0x00012
 #define ID_OPEN_ITEM                    0x00013
-#define ID_RENAME_ITEM                  0x00014
 #define ID_INFO_ITEM                    0x00015
 #define ID_LINK_ITEM                    0x00016
 #define ID_CREATE_FOLDER                0x00017
@@ -22,6 +21,7 @@
 #define ID_FINDER_ICON                  111
 #define ID_MAIN_MENU                    114
 #define ID_ABOUT                        115
+#define ID_HOTKEY                       123
 #define ID_DLG_INFO                     1006
 #define ID_BUTTON_DLG                   1007
 #define ID_NOBJECT_1                    1008
@@ -31,12 +31,12 @@
 #define ID_NOBJECT_5                    1012
 #define ID_NOBJECT_6                    1013
 #define ID_ABOUT_STATIC                 1014
-#define ID_OBJECT_1						1015
-#define ID_OBJECT_2						1016
-#define ID_OBJECT_3						1017
-#define ID_OBJECT_4						1018
-#define ID_OBJECT_5						1019
-#define ID_OBJECT_6						1020
+#define ID_OBJECT_1                     1015
+#define ID_OBJECT_2                     1016
+#define ID_OBJECT_3                     1017
+#define ID_OBJECT_4                     1018
+#define ID_OBJECT_5                     1019
+#define ID_OBJECT_6                     1020
 #define PathInfo                        11000
 #define window_name                     11001
 #define DeleteFileInfo                  11002
@@ -57,7 +57,6 @@
 #define MenuCopy                        11017
 #define MenuDelete                      11018
 #define MenuPaste                       11019
-#define MenuRename                      11020
 #define MenuCreate                      11021
 #define MenuCreateFile                  11022
 #define MenuCreateTxt                   11023
@@ -73,12 +72,12 @@
 #define Copyright                       11033
 #define Menu_file                       11034
 #define Menu_file_exit                  11035
-#define Table_name						11036
-#define Table_date_change				11037
-#define Table_type						11038
-#define Table_size						11039
-#define Table_date_create				11040
-#define Local_disk						11041
+#define Table_name                      11036
+#define Table_date_change               11037
+#define Table_type                      11038
+#define Table_size                      11039
+#define Table_date_create               11040
+#define Local_disk                      11041
 #define ID_PROGRAM_ABOUT                40004
 #define ID_PROGRAM_CLOSE                40005
 #define ID_LANGUAGE                     40006
@@ -90,13 +89,14 @@
 #define ID_BACK_HK                      40013
 #define ID_NEXT_HK                      40014
 #define Menu_exit                       40015
+#define ID_DELETE_HK                    40016
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        123
-#define _APS_NEXT_COMMAND_VALUE         40016
+#define _APS_NEXT_RESOURCE_VALUE        124
+#define _APS_NEXT_COMMAND_VALUE         40021
 #define _APS_NEXT_CONTROL_VALUE         1020
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

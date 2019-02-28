@@ -18,7 +18,6 @@ protected:
 	void _init_main_menu();
 	void _init_tree();
 	void tree_load(HTREEITEM, const std::string &);
-	void update_listview();
 
 	std::string _getPath(HTREEITEM, char *);
 	std::string _get_full_path(HTREEITEM);
@@ -28,5 +27,7 @@ protected:
 	bool _delete(const std::string &);
 	bool open_proc();
 	bool try_paste();
+public:
+	bool refresh();
 	~Functional();
 };

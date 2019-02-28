@@ -6,32 +6,34 @@ void Functional::_init_main_menu()
 	Main_Menu = CreateMenu();
 	HMENU Menu = CreatePopupMenu();
 	HMENU File_add = CreatePopupMenu();
-
 	SmartStringLoad str;
-	AppendMenu(Main_Menu, MFT_STRING | MF_POPUP, (UINT)File_add, str._get(Menu_file));
+
+	AppendMenu(Main_Menu, MFT_STRING | MF_POPUP, reinterpret_cast<unsigned int>(File_add), str._get(Menu_file));
 	{	
 		AppendMenu(File_add, MFT_STRING, ID_PROGRAM_CLOSE, str._get(Menu_file_exit));
 	}
-	AppendMenu(Main_Menu, MFT_STRING | MF_POPUP, (UINT)Menu, str._get(DialogAboutName));
+	AppendMenu(Main_Menu, MFT_STRING | MF_POPUP, reinterpret_cast<unsigned int>(Menu), str._get(DialogAboutName));
 	{
 		AppendMenu(Menu, MFT_STRING | MF_POPUP, ID_PROGRAM_ABOUT, str._get(DialogAboutName));
 	}
+
 	SetMenu(hWnd, Main_Menu);
+	DestroyMenu(File_add);
+	DestroyMenu(Menu);
 }
 
 void Functional::_init_cmenu()
 {
-	UINT enabled = (manip) ? MF_ENABLED : MF_DISABLED;
+	unsigned int enabled = (manip) ? MF_ENABLED : MF_DISABLED;
 	CMenu = CreatePopupMenu();
 	HMENU AdditionalMenu = CreatePopupMenu();
 	SmartStringLoad str;
 
 	AppendMenu(CMenu, MFT_STRING, ID_OPEN_ITEM, str._get(MenuOpen));
 	AppendMenu(CMenu, MFT_SEPARATOR, 0, NULL);
-	AppendMenu(CMenu, MFT_STRING | MF_POPUP, (UINT)AdditionalMenu, str._get(MenuCreate));
+	AppendMenu(CMenu, MFT_STRING | MF_POPUP, reinterpret_cast<unsigned int>(AdditionalMenu), str._get(MenuCreate));
 	{
 		AppendMenu(AdditionalMenu, MFT_STRING, ID_CREATE_FOLDER, str._get(MenuCreateFile));
-		AppendMenu(AdditionalMenu, MFT_SEPARATOR, 0, NULL);
 		AppendMenu(AdditionalMenu, MFT_STRING, ID_CREATE_TEXT_ITEM, str._get(MenuCreateTxt));
 	}
 	AppendMenu(CMenu, MFT_SEPARATOR, 0, NULL);
@@ -42,10 +44,10 @@ void Functional::_init_cmenu()
 	AppendMenu(CMenu, MFT_SEPARATOR, 0, NULL);
 	AppendMenu(CMenu, MFT_STRING, ID_LINK_ITEM, str._get(MenuLink));
 	AppendMenu(CMenu, MFT_STRING, ID_DELETE_ITEM, str._get(MenuDelete));
-	AppendMenu(CMenu, MFT_STRING, ID_RENAME_ITEM, str._get(MenuRename));
 
 	AppendMenu(CMenu, MFT_SEPARATOR, 0, NULL);
 	AppendMenu(CMenu, MFT_STRING, ID_INFO_ITEM, str._get(MenuInfo));
+	DestroyMenu(AdditionalMenu);
 }
 
 void Functional::_init_tree()
@@ -96,7 +98,6 @@ void Functional::disk_list()
 bool Functional::_delete(const std::string &_delete)
 {
 	SmartFinder file;
-
 	if (file.find(_delete)) {
 		try {
 			if (file.is_file()) {
@@ -108,7 +109,7 @@ bool Functional::_delete(const std::string &_delete)
 		}
 		catch (...) {
 			SmartStringLoad str, str_1;
-			MessageBox(NULL, str._get(ErrorDelete, 64), str_1._get(Error_info), MB_OK);
+			MessageBox(hWnd, str._get(ErrorDelete, 64), str_1._get(Error_info), MB_OK);
 			return false;
 		}
 	}
@@ -118,7 +119,6 @@ bool Functional::_delete(const std::string &_delete)
 bool Functional::_add_lw_item(WIN32_FIND_DATA _file)
 {
 	info = new FileInfo(_file);
-
 	int iLastIndex = ListView_GetItemCount(ListView);
 	LVITEM lvi;
 	lvi.mask = LVIF_TEXT;
@@ -138,7 +138,6 @@ bool Functional::_add_lw_item(WIN32_FIND_DATA _file)
 bool Functional::open_proc()
 {
 	SHELLEXECUTEINFO sei;
-
 	sei.cbSize = sizeof(sei);
 	sei.fMask = SEE_MASK_NOCLOSEPROCESS;
 	sei.lpVerb = "open";
@@ -155,7 +154,6 @@ bool Functional::open_proc()
 std::string Functional::_getPath(HTREEITEM _item, char * _temp)
 {
 	TV_ITEM tv;
-
 	tv.mask = TVIF_TEXT | TVIF_HANDLE;
 	tv.hItem = _item;
 	tv.pszText = _temp;
@@ -205,7 +203,7 @@ Functional::Functional(HWND _hWnd) :
 {
 	disk_list();
 	path = new Path(disks->_get_disk(0));
-	update_listview();
+	refresh();
 	_init_tree();
 	_init_main_menu();
 }
@@ -236,7 +234,7 @@ bool Functional::try_paste()
 	}
 	catch (...) {
 		SmartStringLoad str, str_1;
-		MessageBox(NULL, str._get(ErrorPaste), str_1._get(Error_info), MB_OK);
+		MessageBox(hWnd, str._get(ErrorPaste), str_1._get(Error_info), MB_OK);
 		return false;
 	}
 
@@ -244,11 +242,10 @@ bool Functional::try_paste()
 		if (!_delete(manip->file))
 			return false;
 	}
-
 	return true;
 }
 
-void Functional::update_listview()
+bool Functional::refresh()
 {
 	std::string buffer;
 	SmartFinder file;
@@ -258,19 +255,18 @@ void Functional::update_listview()
 
 	if (file.find(path->main_path + "*")) {
 		do {
-			if (file.is_nHidden()) {
+			if (file.not_hidden()) {
 				_add_lw_item(file._get());
 			}
 		} while (file.next());
 	}
-
 	path->item_amount = ListView_GetItemCount(ListView);
+	return path->item_amount;
 }
 
 void Functional::tree_load(HTREEITEM _item, const std::string &_path)
 {
 	SmartFinder file;
-
 	if (!file.find(_path + '*'))
 		return;
 
@@ -279,7 +275,7 @@ void Functional::tree_load(HTREEITEM _item, const std::string &_path)
 	_insert.item.mask = TVIF_TEXT;
 
 	do {
-		if (!file.is_file() && file.is_nHidden()) {
+		if (!file.is_file() && file.not_hidden()) {
 			_insert.item.pszText = file._get().cFileName;
 			TreeView_InsertItem(Tree, &_insert);
 		}
@@ -292,5 +288,4 @@ Functional::~Functional()
 	delete disks;
 	if (manip)
 		delete manip;
-
 }

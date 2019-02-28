@@ -27,7 +27,7 @@ bool SmartFinder::is_file() const
 	return file.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE;
 }
 
-bool SmartFinder::is_nHidden() const
+bool SmartFinder::not_hidden() const
 {
 	return !(file.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) &&
 		!(file.dwFileAttributes &  FILE_ATTRIBUTE_REPARSE_POINT) &&

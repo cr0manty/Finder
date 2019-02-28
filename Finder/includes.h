@@ -13,6 +13,6 @@
 #define Copy false
 #define Paste true
 
-__int64 __stdcall WndProc(HWND, UINT, WPARAM, LPARAM);
+__int64 __stdcall MainFunc(HWND, UINT, WPARAM, LPARAM);
 bool __stdcall DlgInfo(HWND, UINT, WPARAM, LPARAM);
 bool __stdcall DlgAbout(HWND, UINT, WPARAM, LPARAM);

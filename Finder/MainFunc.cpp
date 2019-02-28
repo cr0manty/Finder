@@ -1,6 +1,6 @@
 #include "Finder.h"
 
-__int64 __stdcall WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+__int64 __stdcall MainFunc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static Finder *main;
 
@@ -22,9 +22,6 @@ __int64 __stdcall WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_HOTKEY:
 		return main->hotkey_switch(wParam);
 
-	case WM_KEYDOWN:
-		return main->key_down_switch(wParam);
-
 	case WM_GETMINMAXINFO:
 		return main->fix_size(lParam);
 
@@ -33,12 +30,12 @@ __int64 __stdcall WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_DESTROY:
 		delete main;
-		break;
+		return true;
 
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
-	return 0;
+	return false;
 }
 
 bool __stdcall DlgInfo(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -48,8 +45,9 @@ bool __stdcall DlgInfo(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 	switch (msg)
 	{
 	case WM_INITDIALOG:
-		main = (Finder*)lParam;
-		main->dlgInfo_proc(hDlg, wParam);
+		main = reinterpret_cast<Finder*>(lParam);
+		if(!main->dlgInfo_proc(hDlg))
+			EndDialog(hDlg, LOWORD(wParam));
 		return true;
 
 	case WM_COMMAND:
@@ -70,7 +68,7 @@ bool __stdcall DlgAbout(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_INITDIALOG:
 		SetWindowText(hDlg, str._get(DialogAboutName));
-		SendMessage(GetDlgItem(hDlg, ID_ABOUT_STATIC), WM_SETTEXT, (WPARAM)1024, (LPARAM)str._get(Copyright, 1024));
+		SendMessage(GetDlgItem(hDlg, ID_ABOUT_STATIC), WM_SETTEXT, (WPARAM)1024, reinterpret_cast<__int64>(str._get(Copyright, 1024)));
 		return true;
 		
 	case WM_COMMAND:
@@ -78,7 +76,7 @@ bool __stdcall DlgAbout(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 			EndDialog(hDlg, LOWORD(wParam));
 			return true;
 		}
-		break;
+		return false;
 	}
 	return false;
 }

@@ -7,8 +7,8 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmdL
 	wnd.init_window(nCmdShow);
 
 	while (GetMessage(&wnd.msg, NULL, 0, 0)) {
-			TranslateMessage(&wnd.msg);
-			DispatchMessage(&wnd.msg);
+		TranslateMessage(&wnd.msg);
+		DispatchMessage(&wnd.msg);
 	}
 
 	return wnd.msg.wParam;

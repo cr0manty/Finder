@@ -13,7 +13,7 @@ Objects::Objects(HWND _hWnd, int _size) :
 	_create_listview();
 	_create_tree();
 	_crete_objects();
-	_create_hotkey();
+	create_hotkey();
 	resize();
 }
 
@@ -33,6 +33,11 @@ bool Objects::resize()
 	return true;
 }
 
+bool Objects::minimize() const
+{
+	return ShowWindowAsync(hWnd, SW_MINIMIZE);
+}
+
 void Objects::_create_listview()
 {
 	INITCOMMONCONTROLSEX icex;
@@ -48,7 +53,7 @@ void Objects::_create_listview()
 		LVS_EDITLABELS | LVS_SINGLESEL,
 		WindowRT.left + 300, WindowRT.top + 110, WindowRT.right - 290, WindowRT.bottom - 120,
 		hWnd, 
-		(HMENU)ID_LISTVIEW, 
+		reinterpret_cast<HMENU>(ID_LISTVIEW),
 		hInst,
 		NULL);
 
@@ -68,7 +73,7 @@ void Objects::_create_tree()
 		TVS_HASLINES | TVS_LINESATROOT | TVS_HASBUTTONS | TVS_SHOWSELALWAYS,
 		0, 0, 0, 0,
 		hWnd,
-		(HMENU)ID_TREEVIEW,
+		reinterpret_cast<HMENU>(ID_TREEVIEW),
 		hInst,
 		NULL);
 
@@ -78,18 +83,20 @@ void Objects::_create_tree()
 void Objects::_crete_objects()
 {
 	Edit = CreateWindow("Edit", NULL, WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_READONLY | WS_BORDER,
-		0, 0, 0, 0, hWnd, (HMENU)ID_PATH_EDIT, hInst, NULL);
+		0, 0, 0, 0, hWnd, reinterpret_cast<HMENU>(ID_PATH_EDIT), hInst, NULL);
 	ComboBox = CreateWindow("Combobox", NULL, WS_CHILD | WS_VISIBLE | CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | CB_SHOWDROPDOWN | WS_BORDER,
-		0, 0, 0, 0, hWnd, (HMENU)ID_DISKLIST_CB, hInst, NULL);
+		0, 0, 0, 0, hWnd, reinterpret_cast<HMENU>(ID_DISKLIST_CB), hInst, NULL);
 
 	Button[0] = CreateWindow("Button", "<-", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_BORDER,
-		0, 0, 50, 25, hWnd, (HMENU)ID_BACK_BUTTON, hInst, NULL);
+		0, 0, 50, 25, hWnd, reinterpret_cast<HMENU>(ID_BACK_BUTTON), hInst, NULL);
 	Button[1] = CreateWindow("Button", "->", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_BORDER,
-		50, 0, 50, 25, hWnd, (HMENU)ID_NEXT_BUTTON, hInst, NULL);
+		50, 0, 50, 25, hWnd, reinterpret_cast<HMENU>(ID_NEXT_BUTTON), hInst, NULL);
 }
 
-void Objects::_create_hotkey()
+void Objects::create_hotkey()
 {
+	RegisterHotKey(hWnd, ID_DELETE_HK, NULL, VK_DELETE);
+
 	RegisterHotKey(hWnd, ID_COPY_HK, MOD_CONTROL, 0x43);
 	RegisterHotKey(hWnd, ID_CUT_HK, MOD_CONTROL, 0x58);
 	RegisterHotKey(hWnd, ID_PASTE_HK, MOD_CONTROL, 0x56);
@@ -107,18 +114,16 @@ void Objects::_set_listviw_colum()
 	SmartStringLoad str;
 	RECT rt;
 	GetClientRect(ListView, &rt);
-	int index = -1;
+	int index = 0;
 
 	LVCOLUMN lv;
 	lv.mask = LVCF_TEXT | LVCF_WIDTH;
 	lv.cx = (rt.right - rt.left) / number_colum; 
 	lv.cchTextMax = 256;
 
-	for (int i = 0; i < number_colum; i++) {
-		lv.pszText = (LPSTR)str._get(Table_name + i);
+	for (int i = 0; i < number_colum && index != -1; i++) {
+		lv.pszText = str._get(Table_name + i);
 		index = ListView_InsertColumn(ListView, i, &lv);
-		if (index == -1) 
-			break;
 	}
 }
 
