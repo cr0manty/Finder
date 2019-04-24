@@ -7,17 +7,17 @@ SmartStringLoad::SmartStringLoad() :
 
 char * SmartStringLoad::_get(int _id, int _size)
 {
-	if (string)
-		delete[] string;
+	if (m_Data)
+		delete[] m_Data;
 
-	string = new char[_size];
-	LoadString(hInst, _id, string, _size - 1);
+	m_Data = new char[_size];
+	LoadString(hInst, _id, m_Data, _size - 1);
 
-	return string;
+	return m_Data;
 }
 
 SmartStringLoad::~SmartStringLoad()
 {
-	if (string)
-		delete[] string;
+	if (m_Data)
+		delete[] m_Data;
 }

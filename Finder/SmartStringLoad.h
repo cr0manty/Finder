@@ -2,7 +2,7 @@
 
 class SmartStringLoad
 {
-	char * string;
+	char * m_Data;
 	HINSTANCE hInst;
 public:
 	SmartStringLoad();
