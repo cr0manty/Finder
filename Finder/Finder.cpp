@@ -29,7 +29,7 @@ void Finder::create_folder()
 	std::string temp = same_name(path->main_path + str._get(DefaultFolder));
 
 	try {
-		boost::filesystem::create_directory(temp);
+		std::tr2::sys::create_directory(temp);
 	}
 	catch (...) {
 		return;
@@ -50,7 +50,7 @@ void Finder::rename(__int64 _cmd)
 		return;
 	}
 	try {
-		boost::filesystem::rename(path->selected_file, path->main_path + info->item.pszText);
+		std::tr2::sys::rename(path->selected_file, path->main_path + info->item.pszText);
 	}
 	catch (...) {
 		MessageBox(hWnd, str._get(Error_info), str_1._get(Error_info), MB_OK);

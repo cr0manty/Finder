@@ -1,4 +1,5 @@
 #pragma once
+#define _SILENCE_TR2_SYS_NAMESPACE_DEPRECATION_WARNING
 #define _CRT_SECURE_NO_WARNINGS
 #include <Windows.h>
 #include <string>

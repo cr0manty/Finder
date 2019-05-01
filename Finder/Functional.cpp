@@ -101,10 +101,10 @@ bool Functional::_delete(const std::string &_delete)
 	if (file.find(_delete)) {
 		try {
 			if (file.is_file()) {
-				boost::filesystem::remove(_delete);
+				std::tr2::sys::remove(_delete);
 			}
 			else {
-				boost::filesystem::remove_all(_delete);
+				std::tr2::sys::remove_all(_delete);
 			}
 		}
 		catch (...) {
@@ -226,10 +226,10 @@ bool Functional::try_paste()
 		}
 		check_file.find(manip->file);
 		if (check_file.is_file()) {
-			boost::filesystem::copy_file(manip->file, temp);
+			std::tr2::sys::copy_file(manip->file, temp);
 		}
 		else {
-			boost::filesystem::copy_directory(manip->file, temp);
+			std::tr2::sys::copy(manip->file, temp);
 		}
 	}
 	catch (...) {
