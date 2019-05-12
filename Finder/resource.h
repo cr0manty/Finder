@@ -22,6 +22,44 @@
 #define ID_MAIN_MENU                    114
 #define ID_ABOUT                        115
 #define ID_HOTKEY                       123
+#define IDB_BITMAP1                     124
+#define IDB_BITMAP2                     125
+#define IDB_BITMAP3                     126
+#define IDB_BITMAP4                     127
+#define IDB_BITMAP5                     128
+#define IDB_BITMAP6                     129
+#define IDB_BITMAP7                     130
+#define IDB_BITMAP8                     131
+#define IDB_BITMAP9                     132
+#define IDB_BITMAP10                    133
+#define IDB_BITMAP11                    134
+#define IDB_BITMAP12                    135
+#define IDB_BITMAP13                    136
+#define IDB_BITMAP14                    137
+#define IDB_BITMAP15                    138
+#define IDB_BITMAP16                    139
+#define IDB_BITMAP17                    140
+#define IDB_BITMAP18                    141
+#define IDB_BITMAP19                    142
+#define IDB_BITMAP20                    143
+#define IDB_BITMAP21                    144
+#define IDB_BITMAP22                    145
+#define IDB_BITMAP23                    146
+#define IDB_BITMAP24                    147
+#define IDB_BITMAP25                    148
+#define IDB_BITMAP26                    149
+#define IDB_BITMAP27                    150
+#define IDB_BITMAP28                    151
+#define IDB_BITMAP29                    152
+#define IDB_BITMAP30                    153
+#define IDB_BITMAP31                    154
+#define IDB_BITMAP32                    155
+#define IDB_BITMAP33                    156
+#define IDB_BITMAP34                    157
+#define IDB_BITMAP35                    158
+#define IDB_BITMAP36                    159
+#define IDR_WAVE1                       163
+#define IDR_WAVE2                       164
 #define ID_DLG_INFO                     1006
 #define ID_BUTTON_DLG                   1007
 #define ID_NOBJECT_1                    1008
@@ -95,7 +133,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        124
+#define _APS_NEXT_RESOURCE_VALUE        165
 #define _APS_NEXT_COMMAND_VALUE         40021
 #define _APS_NEXT_CONTROL_VALUE         1020
 #define _APS_NEXT_SYMED_VALUE           101

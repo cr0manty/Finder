@@ -52,3 +52,19 @@ struct Manip
 	operator bool();
 	void clear();
 };
+
+class Shrek
+{
+	PAINTSTRUCT ps;
+	HANDLE hBitmap;
+	HANDLE hOldBitmap;
+	BITMAP Bitmap;
+	HDC hCompatibleDC;
+	RECT rt;
+	HWND *hDlg;
+	HDC hdc;
+public:
+	Shrek(HWND &, RECT);
+	void make_picture(int);
+	~Shrek();
+};

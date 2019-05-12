@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Shrek">
+      <UniqueIdentifier>{2a079505-62ca-4547-8bf1-c28790078156}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Finder.cpp">
@@ -81,5 +84,118 @@
     <Image Include="Finder.ico">
       <Filter>Файлы ресурсов</Filter>
     </Image>
+    <Image Include="Shrek\0.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\1.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\2.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\3.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\4.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\5.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\6.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\7.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\8.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\9.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\10.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\11.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\12.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\13.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\14.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\15.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\16.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\17.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\18.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\19.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\20.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\21.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\22.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\23.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\24.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\25.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\26.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\27.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\28.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\29.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\30.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\31.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\32.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\33.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\34.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+    <Image Include="Shrek\35.bmp">
+      <Filter>Shrek</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="Shrek\Shrek.wav">
+      <Filter>Shrek</Filter>
+    </Media>
   </ItemGroup>
 </Project>

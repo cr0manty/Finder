@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "includes.h"
+#pragma comment(lib,"Winmm.lib")
 
 Manip::Manip(const std::string &_buffer, const std::string &_path, bool _cut) :
 	file(_buffer), aDelete(_cut), path(_path)
@@ -179,4 +180,30 @@ char * FileInfo::_get_header(int _switch)
 		temp = " ";
 	}
 	return const_cast<char*>(temp.c_str());
+}
+
+Shrek::Shrek(HWND & _hDlg, RECT _rt) :
+	hDlg(&_hDlg), rt(_rt)
+{
+	PlaySound(MAKEINTRESOURCE(IDR_WAVE2), 0, SND_RESOURCE | SND_ASYNC | SND_MEMORY);
+}
+
+void Shrek::make_picture(int _id)
+{
+	hdc = BeginPaint(*hDlg, &ps);
+	hBitmap = LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(_id), IMAGE_BITMAP, 0, 0, NULL);
+	GetObject(hBitmap, sizeof(BITMAP), &Bitmap);
+	hCompatibleDC = CreateCompatibleDC(hdc);
+	hOldBitmap = SelectObject(hCompatibleDC, hBitmap);
+	StretchBlt(hdc, 0, 0, rt.right, rt.bottom, hCompatibleDC, 0, 0, Bitmap.bmWidth,
+		Bitmap.bmHeight, SRCCOPY);
+	SelectObject(hCompatibleDC, hOldBitmap);
+	DeleteObject(hBitmap);
+	DeleteDC(hCompatibleDC);
+	EndPaint(*hDlg, &ps);
+}
+
+Shrek::~Shrek()
+{
+	PlaySound(NULL, NULL, NULL);
 }

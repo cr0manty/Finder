@@ -239,7 +239,7 @@ void Finder::show_info()
 
 void Finder::show_about()
 {
-	DialogBox(hInst, MAKEINTRESOURCE(ID_ABOUT), hWnd, reinterpret_cast<DLGPROC>(DlgAbout));
+	DialogBox(hInst, MAKEINTRESOURCE(ID_ABOUT), hWnd, reinterpret_cast<DLGPROC>(DlgAbout), reinterpret_cast<unsigned __int64>(this));
 }
 
 void Finder::tree_to_list()

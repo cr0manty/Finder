@@ -150,6 +150,45 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Finder.ico" />
+    <Image Include="Shrek\0.bmp" />
+    <Image Include="Shrek\1.bmp" />
+    <Image Include="Shrek\10.bmp" />
+    <Image Include="Shrek\11.bmp" />
+    <Image Include="Shrek\12.bmp" />
+    <Image Include="Shrek\13.bmp" />
+    <Image Include="Shrek\14.bmp" />
+    <Image Include="Shrek\15.bmp" />
+    <Image Include="Shrek\16.bmp" />
+    <Image Include="Shrek\17.bmp" />
+    <Image Include="Shrek\18.bmp" />
+    <Image Include="Shrek\19.bmp" />
+    <Image Include="Shrek\2.bmp" />
+    <Image Include="Shrek\20.bmp" />
+    <Image Include="Shrek\21.bmp" />
+    <Image Include="Shrek\22.bmp" />
+    <Image Include="Shrek\23.bmp" />
+    <Image Include="Shrek\24.bmp" />
+    <Image Include="Shrek\25.bmp" />
+    <Image Include="Shrek\26.bmp" />
+    <Image Include="Shrek\27.bmp" />
+    <Image Include="Shrek\28.bmp" />
+    <Image Include="Shrek\29.bmp" />
+    <Image Include="Shrek\3.bmp" />
+    <Image Include="Shrek\30.bmp" />
+    <Image Include="Shrek\31.bmp" />
+    <Image Include="Shrek\32.bmp" />
+    <Image Include="Shrek\33.bmp" />
+    <Image Include="Shrek\34.bmp" />
+    <Image Include="Shrek\35.bmp" />
+    <Image Include="Shrek\4.bmp" />
+    <Image Include="Shrek\5.bmp" />
+    <Image Include="Shrek\6.bmp" />
+    <Image Include="Shrek\7.bmp" />
+    <Image Include="Shrek\8.bmp" />
+    <Image Include="Shrek\9.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="Shrek\Shrek.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

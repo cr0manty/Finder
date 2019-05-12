@@ -3,6 +3,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <Windows.h>
 #include <string>
+#include <filesystem>
 #include <commctrl.h>
 #include "resource.h"
 #include "Objects.h"

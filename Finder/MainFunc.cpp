@@ -63,17 +63,35 @@ bool __stdcall DlgInfo(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 bool __stdcall DlgAbout(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	SmartStringLoad str;
+	RECT rt;
+	static int i = IDB_BITMAP1;
+	static int timer = 111;
+	static Shrek *shrek;
 
 	switch (msg)
 	{
 	case WM_INITDIALOG:
 		SetWindowText(hDlg, str._get(DialogAboutName));
 		SendMessage(GetDlgItem(hDlg, ID_ABOUT_STATIC), WM_SETTEXT, (WPARAM)1024, reinterpret_cast<__int64>(str._get(Copyright, 1024)));
+		SetTimer(hDlg, timer, 70, NULL);
+		GetClientRect(hDlg, &rt);
+		shrek = new Shrek(hDlg, rt);
 		return true;
 		
+	case WM_TIMER:
+		i = i == IDB_BITMAP36 ? i = IDB_BITMAP1 : i + 1;
+		InvalidateRect(hDlg, NULL, TRUE);
+		break;
+
+	case WM_PAINT:
+		shrek->make_picture(i);
+		break;
+
 	case WM_COMMAND:
 		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL) {
+			KillTimer(hDlg, timer);
 			EndDialog(hDlg, LOWORD(wParam));
+			delete shrek;
 			return true;
 		}
 		return false;
