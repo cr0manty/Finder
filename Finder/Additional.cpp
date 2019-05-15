@@ -185,7 +185,7 @@ char * FileInfo::_get_header(int _switch)
 Shrek::Shrek(HWND & _hDlg, RECT _rt) :
 	hDlg(&_hDlg), rt(_rt)
 {
-	PlaySound(MAKEINTRESOURCE(IDR_WAVE2), 0, SND_RESOURCE | SND_ASYNC | SND_MEMORY);
+	PlaySound(MAKEINTRESOURCE(IDR_WAVE1), 0, SND_RESOURCE | SND_ASYNC | SND_MEMORY);
 }
 
 void Shrek::make_picture(int _id)
